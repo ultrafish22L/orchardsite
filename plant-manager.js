@@ -166,7 +166,6 @@ window.PlantManager = (function() {
         const overlay = document.getElementById('detailOverlay');
         const images = document.getElementById('detailImages');
         const text = document.getElementById('detailText');
-        const moreResourcesLink = document.getElementById('moreResourcesLink');
         
         const imageUrls = [];
         if (plant.plant_photo) imageUrls.push({ url: plant.plant_photo, label: 'Plant' });
