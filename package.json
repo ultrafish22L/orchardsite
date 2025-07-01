@@ -1,0 +1,160 @@
+{
+  "name": "giant-sloth-weather-station",
+  "version": "2.0.0",
+  "description": "Complete weather station dashboard for Giant Sloth Orchard with WeatherLink v2 Cloud API and Local API support",
+  "main": "proxy-server.js",
+  "scripts": {
+    "start": "node proxy-server.js",
+    "dev": "nodemon proxy-server.js --watch proxy-server.js --watch public/",
+    "build": "echo 'Static site - no build needed. Files ready for deployment.'",
+    "deploy": "echo 'Deploy: Copy proxy-server.js, package.json, and public/ folder to your hosting service'",
+    "test": "node scripts/test-apis.js",
+    "test:cloud": "node scripts/test-cloud-api.js",
+    "test:local": "node scripts/test-local-api.js",
+    "lint": "echo 'Run: npm install eslint --save-dev && npx eslint proxy-server.js'",
+    "setup": "node scripts/setup.js",
+    "backup": "node scripts/backup-data.js",
+    "restore": "node scripts/restore-data.js",
+    "export": "node scripts/export-csv.js",
+    "discover": "node scripts/discover-devices.js",
+    "install-deps": "npm install",
+    "health": "curl -s http://localhost:3000/api/health | jq .",
+    "status": "curl -s http://localhost:3000/api/status | jq .",
+    "demo": "curl -s http://localhost:3000/api/demo/current | jq .",
+    "logs": "tail -f logs/weather-station.log",
+    "clean": "rm -rf node_modules package-lock.json && npm install"
+  },
+  "keywords": [
+    "weather",
+    "weatherlink",
+    "weatherlink-v2",
+    "davis-instruments",
+    "dashboard",
+    "hawaii",
+    "farm",
+    "tropical",
+    "api",
+    "proxy",
+    "cors",
+    "nodejs",
+    "express",
+    "giant-sloth",
+    "orchard",
+    "agriculture",
+    "monitoring",
+    "real-time",
+    "charts",
+    "visualization"
+  ],
+  "author": {
+    "name": "Giant Sloth Orchard",
+    "email": "tech@giantslothorchard.com",
+    "url": "https://giantslothorchard.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "http-proxy-middleware": "^2.0.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "eslint": "^8.50.0"
+  },
+  "optionalDependencies": {
+    "pm2": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/giant-sloth-orchard/weather-station.git"
+  },
+  "bugs": {
+    "url": "https://github.com/giant-sloth-orchard/weather-station/issues"
+  },
+  "homepage": "https://weather.giantslothorchard.com",
+  "config": {
+    "port": 3000,
+    "cors": true,
+    "proxy": {
+      "local": true,
+      "cloud": true
+    },
+    "features": {
+      "discovery": true,
+      "testing": true,
+      "demoMode": true,
+      "logging": true
+    }
+  },
+  "nodemonConfig": {
+    "watch": [
+      "proxy-server.js",
+      "public/",
+      "scripts/"
+    ],
+    "ext": "js,html,css,json",
+    "ignore": [
+      "node_modules/",
+      "data/",
+      "logs/",
+      "backups/",
+      "*.log"
+    ],
+    "delay": 1000,
+    "verbose": true
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "rules": {
+      "no-console": "off",
+      "no-unused-vars": "warn"
+    }
+  },
+  "pm2": {
+    "name": "giant-sloth-weather",
+    "script": "proxy-server.js",
+    "instances": 1,
+    "exec_mode": "fork",
+    "watch": false,
+    "max_memory_restart": "500M",
+    "env": {
+      "NODE_ENV": "production",
+      "PORT": 3000
+    },
+    "log_file": "logs/weather-station.log",
+    "error_file": "logs/weather-station-error.log",
+    "out_file": "logs/weather-station-out.log",
+    "time": true
+  },
+  "directories": {
+    "public": "public",
+    "scripts": "scripts",
+    "logs": "logs",
+    "data": "data",
+    "backups": "backups"
+  },
+  "files": [
+    "proxy-server.js",
+    "public/",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}

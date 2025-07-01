@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giant Sloth Orchard - Exotic Tropical Plants & Rare Fruits</title>
+    <meta name="description" content="Giant Sloth Orchard - Specializing in exotic tropical plants and rare fruits on the Big Island of Hawaii. Grow rare and delicious tropical fruits, herbs, and spices.">
+    <meta name="keywords" content="tropical plants, exotic fruits, Hawaii, Big Island, rare plants, tropical farming, cacao, theobroma">
+    <meta name="author" content="Giant Sloth Orchard">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="giantslothorchard.png">
+    
+    <!-- External Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="giantslothorchard.png" alt="Giant Sloth Orchard Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="display: none;">🦥</span>
+            </div>
+            <div class="header-text">
+                <h1>Giant Sloth Orchard</h1>
+                <p>Exotic Tropical Plants & Rare Fruits 🌺 Big Island, Hawaii</p>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navigation">
+        <div class="nav-container">
+            <div class="primary-nav">
+                <div class="primary-nav-buttons">
+                    <button class="nav-btn active" data-page="home">Home</button>
+                    <button class="nav-btn" data-page="weather">Weather</button>
+                    <button class="nav-btn" data-page="map">Map</button>
+                    <button class="nav-btn" data-page="resources">Resources</button>
+                    <button class="nav-btn" data-page="about">About</button>
+                    <button class="nav-btn" data-page="contact">Contact</button>
+                </div>
+                <div class="search-container">
+                    <input type="text" placeholder="Search plants..." id="searchInput" autocomplete="off">
+                </div>
+            </div>
+            
+            <div class="secondary-nav" id="plantNav">
+                <button class="nav-btn active" data-category="all">All</button>
+                <button class="nav-btn" data-category="bananas">Bananas</button>
+                <button class="nav-btn" data-category="citrus">Citrus</button>
+                <button class="nav-btn" data-category="theobroma">Theobroma</button>
+                <button class="nav-btn" data-category="fruit">Fruit</button>
+                <button class="nav-btn" data-category="herbs">Herbs & Spices</button>
+                <button class="nav-btn" data-category="carnivorous">Carnivorous</button>
+                <button class="nav-btn" data-category="ornamental">Ornamental</button>
+                <button class="nav-btn" data-category="wishlist">Wish List</button>
+            </div>
+            
+            <div class="secondary-nav hidden" id="weatherNav">
+                <button class="nav-btn active" id="dashboard-btn">Dashboard</button>
+                <button class="nav-btn" id="graphs-btn">Graphs</button>
+                <div class="mode-dropdown">
+                    <button class="nav-btn" id="mode-btn">Demo Mode</button>
+                    <div class="dropdown-content" id="mode-dropdown">
+                        <div class="dropdown-item" data-mode="demo">Demo Mode</div>
+                        <div class="dropdown-item" data-mode="cloud">Cloud API</div>
+                        <div class="dropdown-item" data-mode="local">Local API</div>
+                        <div class="dropdown-item" data-mode="auto">Auto Mode</div>
+                    </div>
+                </div>
+                <button class="nav-btn" id="weather-settings-btn" title="Weather Settings" style="margin-left: auto;">⚙️</button>
+            </div>
+            
+            <div class="secondary-nav hidden" id="mapNav">
+                <select class="nav-btn" id="map-plant-select">
+                    <option value="">Select plant to add...</option>
+                </select>
+                <button class="nav-btn" id="map-add-btn" title="Add selected plant to map">+</button>
+                <button class="nav-btn" id="map-edit-btn" title="Edit plant positions">✏️</button>
+                <button class="nav-btn" id="map-delete-btn" title="Delete selected plant from map">🗑️</button>
+                <div class="hidden" id="map-edit-controls">
+                    <button class="nav-btn" id="map-cancel-btn" style="color: #ff6b6b;" title="Cancel plant map change">✕</button>
+                    <button class="nav-btn" id="map-confirm-btn" style="color: #44ff44;" title="Confirm plant map change">✓</button>
+                </div>
+            </div>
+            
+            <div class="secondary-nav hidden" id="defaultNav">
+                <span style="opacity: 0.6; font-size: 1.6rem;">🌺 🌿 🍃 🦋 ✨ 🦥 🍎 🍋 🍫 🌴 🥭 🌊 ☀️ 🌸</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Resources Page -->
+        <div id="resourcesPage" class="page-content hidden">
+            <h2>🌱 Resources & Growing Guide 📚</h2>
+            
+            <div style="background: rgba(0,0,0,0.2); padding: 2rem; border-radius: 15px; margin-bottom: 2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <a href="https://plantpono.org/" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px; border: 1px solid rgba(64, 224, 208, 0.3); transition: all 0.3s ease; text-decoration: none; color: white;">
+                        <span style="font-size: 1.5rem;">🌱</span>
+                        <span>Plant Pono</span>
+                    </a>
+                    <a href="https://cms.ctahr.hawaii.edu/" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px; border: 1px solid rgba(64, 224, 208, 0.3); transition: all 0.3s ease; text-decoration: none; color: white;">
+                        <span style="font-size: 1.5rem;">🏫</span>
+                        <span>CTAHR Hawaii</span>
+                    </a>
+                    <a href="https://wildlifeofhawaii.com/" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; gap: 0.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px; border: 1px solid rgba(64, 224, 208, 0.3); transition: all 0.3s ease; text-decoration: none; color: white;">
+                        <span style="font-size: 1.5rem;">🌺</span>
+                        <span>Wildlife of Hawaii</span>
+                    </a>
+                </div>
+                <h3 style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; color: #7fffd4;">
+                    <span style="font-size: 1.5rem;">🥑</span>
+                    <span>Avocado Growing Notes</span>
+                    <span style="font-size: 1.2rem;">🌿</span>
+                </h3>
+                <ul style="list-style: none; padding-left: 0;">
+                    <li style="margin-bottom: 0.5rem;">🥑 sharwill N, greengold SE, malama SW.</li>
+                    <li style="margin-bottom: 0.5rem;">🥑 plant right away, match pot depth.</li>
+                    <li style="margin-bottom: 0.5rem;">🥑 clear grass double hole radius, mulch but not on the trunk.</li>
+                    <li style="margin-bottom: 0.5rem;">🥑 prune at a shoot that is pointing in the desired direction.</li>
+                    <li style="margin-bottom: 0.5rem;">🥑 the canopy should create a bowl with equal thirds.</li>
+                    <li style="margin-bottom: 0.5rem;">🥑 heading, not topping.</li>
+                    <li style="margin-bottom: 0.5rem;">🥑 important to remove all shoots on the graft rootstock.</li>
+                    <li style="margin-bottom: 0.5rem;">🥑 malama is a second graft that will eventually overtake the slower greengold.</li>
+                    <li style="margin-bottom: 0.5rem;">🥑 sharwil's fruit lasts longer on the tree, ok to let it have a little extra growth.</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: rgba(0,0,0,0.2); border-radius: 15px;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🌱 📖 🌿 🍃 📚 ✨</div>
+                <p style="color: #7fffd4; font-style: italic; margin: 0;">"Knowledge grows the best gardens"</p>
+            </div>
+        </div>
+
+        <!-- About Page -->
+        <div id="aboutPage" class="page-content hidden">
+            <h2>🌺 About Giant Sloth Orchard 🦥</h2>
+
+            <div style="text-align: left; margin-top: 1rem; padding: 2rem; background: rgba(0,0,0,0.2); border-radius: 15px;">
+                <p style="margin-top: 0; margin-bottom: 1rem;">🏝️ Located on the beautiful Big Island of Hawaii, Giant Sloth Orchard is a small tropical farm specializing in exotic food trees and plants. We grow rare and delicious tropical fruits, herbs, and spices to nourish our ohana and share the bounty of Hawaii's incredible growing climate.</p>
+                <p style="margin-bottom: 0;">🍫 Giant sloths love cacao. We support the delicate balance of the forest. Our food is of the gods. Not incidental in FishDivine evolution, we decide which fruits thrive as tastier, more nutritious, multivariate delights. We are aware of our stereotype, but unvexed, with ease, we deliberately follow our noses with curiosity...ever seeking theobroma.</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: rgba(0,0,0,0.2); border-radius: 15px;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🌿 🥭 🌺 🦋 🌴 ✨</div>
+                <p style="color: #7fffd4; font-style: italic; margin: 0;">"Where tropical dreams grow into delicious reality"</p>
+            </div>
+        </div>
+
+        <!-- Contact Page -->
+        <div id="contactPage" class="page-content hidden">
+            <h2>🌴 Contact Us 🦥</h2>
+            
+            <div style="text-align: left; margin-top: 1rem; padding: 2rem; background: rgba(0,0,0,0.2); border-radius: 15px;">
+                <p style="margin-top: 0; margin-bottom: 0;">📞 Visits to Giant Sloth Orchard are available by appointment only.</p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: rgba(0,0,0,0.2); border-radius: 15px;">
+                <div style="font-size: 2rem; margin-bottom: 1rem;">🦥 🌺 🍫 🌿 🏝️ ✨</div>
+                <p style="color: #7fffd4; font-style: italic; margin: 0;">"Live large, move slow, and eat cacao"</p>
+            </div>
+        </div>
+
+        <!-- Weather Content -->
+        <div class="weather-content hidden" id="weatherContent">
+            <div class="widgets-grid" id="dashboard">
+                <!-- Weather widgets will be populated by JavaScript -->
+            </div>
+
+            <div class="charts-container" id="charts">
+                <div class="chart-controls">
+                    <select class="chart-btn" id="chart-param-select">
+                        <option value="temperature">Temperature</option>
+                        <option value="pressure">Pressure</option>
+                        <option value="humidity">Humidity</option>
+                        <option value="uvIndex">UV Index</option>
+                        <option value="windDirection">Wind Direction</option>
+                        <option value="windSpeed">Wind Speed</option>
+                        <option value="rainfall">Rainfall</option>
+                        <option value="battery">Battery</option>
+                        <option value="indoorTemp">Indoor Temperature</option>
+                        <option value="indoorHumidity">Indoor Humidity</option>
+                        <option value="solar">Solar Radiation</option>
+                    </select>
+                    <button class="chart-btn active" data-range="24h">24 Hours</button>
+                    <button class="chart-btn" data-range="7d">7 Days</button>
+                    <button class="chart-btn" data-range="30d">30 Days</button>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="main-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Content -->
+        <div class="map-content hidden" id="mapContent">
+            <div class="map-container" id="mapContainer">
+                <!-- Map plants will be rendered here -->
+            </div>
+        </div>
+
+        <!-- Plant Grid (Home Page) -->
+        <div id="plantGrid" class="plant-grid"></div>
+        
+        <!-- Loading and Error Messages -->
+        <div id="loadingMessage" class="loading-message hidden">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🌱</div>
+            <h3>Loading Plant Database...</h3>
+            <p>Please wait while we load the tropical plants collection.</p>
+        </div>
+
+        <div id="errorMessage" class="error-message hidden">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <h3>Plant Database Not Found</h3>
+            <p><strong>The plant database file could not be loaded.</strong></p>
+            <div style="text-align: left; margin: 1.5rem 0; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 8px; font-family: monospace; font-size: 0.85rem;">
+                <p style="margin: 0 0 0.5rem 0;"><strong>Expected location:</strong></p>
+                <p style="margin: 0; color: #7fffd4;" id="expected-db-path">plantdatabase.js</p>
+            </div>
+            <p><strong>Solutions:</strong></p>
+            <ul style="text-align: left; margin: 1rem 0;">
+                <li>Make sure <code>plantdatabase.js</code> is in the same folder as this HTML file</li>
+                <li>Check that the file name is exactly <code>plantdatabase.js</code> (case-sensitive)</li>
+                <li>Ensure the file starts with <code>plants = [...]</code> (not <code>let plants = [...]</code>)</li>
+            </ul>
+            <p style="color: #7fffd4; margin-top: 1.5rem;">Weather functionality will still work - click the Weather button above.</p>
+        </div>
+
+        <div id="noResults" class="no-results hidden">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+            <h3>No Plants Found</h3>
+            <p>No plants match your current search or category selection.</p>
+        </div>
+    </main>
+
+    <!-- Plant Detail Modal -->
+    <div id="detailOverlay" class="detail-overlay">
+        <div class="detail-window">
+            <button class="detail-close-btn" onclick="closeDetail()" aria-label="Close detail view">✕</button>
+            <div class="detail-content">
+                <div class="detail-images" id="detailImages"></div>
+                <div class="detail-text" id="detailText"></div>
+            </div>
+            <div class="detail-controls">
+                <a href="#" class="more-resources" id="moreResourcesLink" target="_blank" rel="noopener noreferrer">More Resources</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Modal -->
+    <div id="photoModal" class="photo-modal" onclick="closePhotoModal()">
+        <img id="modalImage" src="" alt="Plant photo enlarged view">
+    </div>
+
+    <!-- Weather Settings Panel -->
+    <div class="settings-overlay hidden" id="weather-settings-overlay"></div>
+    <div class="settings-panel hidden" id="weather-settings-panel">
+        <button class="close-btn" onclick="closeWeatherSettings()">✕</button>
+        <h2 style="color: #7fffd4; margin-bottom: 1.5rem;">⚙️ Weather Station Settings</h2>
+        
+        <div class="settings-section">
+            <h3>🌍 API Configuration</h3>
+            
+            <!-- Cloud API Settings -->
+            <div class="api-section" style="margin-bottom: 1.5rem;">
+                <h4 style="color: #40e0d0; margin-bottom: 1rem;">☁️ WeatherLink Cloud API</h4>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <span>API Key</span>
+                        <input type="text" class="setting-input" id="weather-cloud-api-key" placeholder="Enter WeatherLink API key">
+                    </div>
+                    <div class="setting-item">
+                        <span>Station ID</span>
+                        <input type="text" class="setting-input" id="weather-cloud-station-id" placeholder="Enter station ID">
+                    </div>
+                    <div class="setting-item">
+                        <span>API Secret</span>
+                        <input type="password" class="setting-input" id="weather-cloud-api-secret" placeholder="Enter API secret">
+                    </div>
+                    <div class="setting-item">
+                        <button class="nav-btn" id="test-weather-cloud-api">Test Cloud API</button>
+                        <span id="cloud-test-result" style="margin-left: 10px; font-size: 0.8rem;"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Local API Settings -->
+            <div class="api-section" style="margin-bottom: 1.5rem;">
+                <h4 style="color: #40e0d0; margin-bottom: 1rem;">🏠 Local WeatherLink Device</h4>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <span>Device IP Address</span>
+                        <input type="text" class="setting-input" id="weather-local-ip" placeholder="192.168.1.100" value="192.168.1.100">
+                    </div>
+                    <div class="setting-item">
+                        <span>Port</span>
+                        <input type="number" class="setting-input" id="weather-local-port" placeholder="80" value="80">
+                    </div>
+                    <div class="setting-item">
+                        <span>Use HTTPS</span>
+                        <div class="setting-toggle" id="weather-local-https-toggle"></div>
+                    </div>
+                    <div class="setting-item">
+                        <span>Proxy Server URL</span>
+                        <input type="text" class="setting-input" id="weather-proxy-url" placeholder="http://localhost:3000" value="http://localhost:3000">
+                    </div>
+                    <div class="setting-item">
+                        <button class="nav-btn" id="test-weather-local-api">Test Local API</button>
+                        <span id="local-test-result" style="margin-left: 10px; font-size: 0.8rem;"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>📊 Widget Configuration</h3>
+            <div class="api-section">
+                <div class="widget-toggles-grid" id="weather-widget-toggles">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>⏱️ Update Intervals</h3>
+            <div class="api-section">
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <span>Live Update Interval</span>
+                        <select class="setting-select" id="weather-live-interval">
+                            <option value="1" selected>1 second</option>
+                            <option value="5">5 seconds</option>
+                            <option value="10">10 seconds</option>
+                            <option value="30">30 seconds</option>
+                            <option value="60">1 minute</option>
+                            <option value="300">5 minutes</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <span>Historical Save Interval</span>
+                        <select class="setting-select" id="weather-history-interval">
+                            <option value="900" selected>15 minutes</option>
+                            <option value="1800">30 minutes</option>
+                            <option value="3600">1 hour</option>
+                            <option value="7200">2 hours</option>
+                            <option value="21600">6 hours</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>💾 Data Management</h3>
+            <div class="api-section">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-start;">
+                    <button class="nav-btn" id="export-weather-data">Export JSON</button>
+                    <button class="nav-btn" id="export-weather-csv">Export CSV</button>
+                    <button class="nav-btn" id="clear-weather-data">Clear Data</button>
+                    <button class="nav-btn" id="import-weather-data">Import Data</button>
+                </div>
+                <input type="file" id="weather-import-file" accept=".json" style="display: none;">
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>📈 Performance Statistics</h3>
+            <div class="api-section">
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <span>API Calls</span>
+                        <span id="stats-api-calls">0</span>
+                    </div>
+                    <div class="setting-item">
+                        <span>Success Rate</span>
+                        <span id="stats-success-rate">100%</span>
+                    </div>
+                    <div class="setting-item">
+                        <span>Response Time</span>
+                        <span id="stats-response-time">0ms</span>
+                    </div>
+                    <div class="setting-item">
+                        <span>Data Points</span>
+                        <span id="stats-data-points">0</span>
+                    </div>
+                    <div class="setting-item">
+                        <span>Connection Status</span>
+                        <span id="stats-connection-status">Disconnected</span>
+                    </div>
+                    <div class="setting-item">
+                        <span>Last Update</span>
+                        <span id="stats-last-update">Never</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-bar">
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-item">
+                    <span class="footer-label">Plants:</span>
+                    <span class="footer-value" id="footer-plant-count">0</span>
+                </div>
+                <div class="footer-item">
+                    <span class="footer-label">Categories:</span>
+                    <span class="footer-value" id="footer-category-count">8</span>
+                </div>
+                <div class="footer-item">
+                    <span class="footer-label">Wishlist:</span>
+                    <span class="footer-value" id="footer-wishlist-count">0</span>
+                </div>
+            </div>
+            <div class="footer-center">
+                <span class="weather-status-text">Weather</span>
+                <div class="weather-status-led connected" id="footer-weather-led"></div>
+                <span class="weather-status-value" id="footer-weather-status">--</span>
+                <span class="weather-status-value" id="footer-weather-temp">--C</span>
+                <span class="weather-status-value" id="footer-weather-humidity">--%</span>
+                <span class="weather-status-value" id="footer-weather-rain">--.--"</span>
+                <span class="weather-status-value" id="footer-last-update">--:--:--</span>
+            </div>
+            <div class="footer-right">
+                <div class="footer-item" style="opacity: 0.6;">
+                    <span id="footer-description">Tropical Food Paradise © 2025 Giant Sloth Orchard</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Modules -->
+    <script src="plant-manager.js"></script>
+    <script src="weather-manager.js"></script>
+    <script src="map-manager.js"></script>
+    <script src="app.js"></script>
+    
+    <!-- Weather Settings JavaScript -->
+    <script>
+        // Weather Settings JavaScript Functions
+        function openWeatherSettings() {
+            if (!window.WeatherManager) {
+                console.error('WeatherManager not available');
+                return;
+            }
+            
+            const overlay = document.getElementById('weather-settings-overlay');
+            const panel = document.getElementById('weather-settings-panel');
+            
+            if (overlay && panel) {
+                overlay.classList.add('show');
+                panel.classList.add('show');
+                populateWeatherSettings();
+            }
+        }
+
+        function closeWeatherSettings() {
+            const overlay = document.getElementById('weather-settings-overlay');
+            const panel = document.getElementById('weather-settings-panel');
+            
+            if (overlay && panel) {
+                overlay.classList.remove('show');
+                panel.classList.remove('show');
+            }
+        }
+
+        function populateWeatherSettings() {
+            if (!window.WeatherManager) return;
+            
+            const apiSettings = window.WeatherManager.getApiSettings();
+            const widgetConfigs = window.WeatherManager.getWidgetConfigs();
+            const widgetSettings = window.WeatherManager.getWidgetSettings();
+            const stats = window.WeatherManager.getWeatherPerformanceStats();
+            
+            // Populate API settings
+            document.getElementById('weather-cloud-api-key').value = apiSettings.cloud.apiKey || '';
+            document.getElementById('weather-cloud-station-id').value = apiSettings.cloud.stationId || '';
+            document.getElementById('weather-cloud-api-secret').value = apiSettings.cloud.apiSecret || '';
+            document.getElementById('weather-local-ip').value = apiSettings.local.ip || '';
+            document.getElementById('weather-local-port').value = apiSettings.local.port || '80';
+            document.getElementById('weather-proxy-url').value = apiSettings.local.proxyUrl || '';
+            
+            // Set HTTPS toggle
+            const httpsToggle = document.getElementById('weather-local-https-toggle');
+            if (httpsToggle) {
+                if (apiSettings.local.https) {
+                    httpsToggle.classList.add('active');
+                } else {
+                    httpsToggle.classList.remove('active');
+                }
+            }
+            
+            // Populate widget toggles
+            const togglesContainer = document.getElementById('weather-widget-toggles');
+            if (togglesContainer) {
+                togglesContainer.innerHTML = '';
+                
+                Object.entries(widgetConfigs).forEach(([key, config]) => {
+                    const item = document.createElement('div');
+                    item.className = 'setting-item';
+                    item.innerHTML = `
+                        <span>${config.title}</span>
+                        <div class="setting-toggle ${widgetSettings[key] ? 'active' : ''}" data-widget="${key}"></div>
+                    `;
+                    
+                    const toggle = item.querySelector('.setting-toggle');
+                    toggle.addEventListener('click', () => toggleWeatherWidget(key));
+                    
+                    togglesContainer.appendChild(item);
+                });
+            }
+            
+            // Populate performance stats
+            document.getElementById('stats-api-calls').textContent = stats.apiCalls;
+            document.getElementById('stats-success-rate').textContent = `${stats.successRate}%`;
+            document.getElementById('stats-response-time').textContent = `${stats.avgResponseTime}ms`;
+            document.getElementById('stats-data-points').textContent = stats.dataPoints;
+            document.getElementById('stats-connection-status').textContent = stats.connectionStatus;
+            document.getElementById('stats-last-update').textContent = stats.lastUpdate ? 
+                stats.lastUpdate.toLocaleString() : 'Never';
+        }
+
+        function toggleWeatherWidget(key) {
+            if (!window.WeatherManager) return;
+            
+            const widgetSettings = window.WeatherManager.getWidgetSettings();
+            const newState = !widgetSettings[key];
+            
+            window.WeatherManager.updateWidgetSettings(key, newState);
+            window.WeatherManager.updateWeatherWidgets();
+            populateWeatherSettings();
+            
+            const widgetConfigs = window.WeatherManager.getWidgetConfigs();
+            console.log(`${widgetConfigs[key].title} widget ${newState ? 'enabled' : 'disabled'}`);
+        }
+
+        function setupWeatherSettingsEventListeners() {
+            // Settings button
+            const settingsBtn = document.getElementById('weather-settings-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', openWeatherSettings);
+            }
+            
+            // Settings overlay
+            const overlay = document.getElementById('weather-settings-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', closeWeatherSettings);
+            }
+            
+            // API configuration inputs
+            const cloudApiKey = document.getElementById('weather-cloud-api-key');
+            const cloudStationId = document.getElementById('weather-cloud-station-id');
+            const cloudApiSecret = document.getElementById('weather-cloud-api-secret');
+            const localIp = document.getElementById('weather-local-ip');
+            const localPort = document.getElementById('weather-local-port');
+            const proxyUrl = document.getElementById('weather-proxy-url');
+            
+            if (cloudApiKey) {
+                cloudApiKey.addEventListener('change', (e) => {
+                    window.WeatherManager.updateApiSettings('cloud', { apiKey: e.target.value });
+                });
+            }
+            
+            if (cloudStationId) {
+                cloudStationId.addEventListener('change', (e) => {
+                    window.WeatherManager.updateApiSettings('cloud', { stationId: e.target.value });
+                });
+            }
+            
+            if (cloudApiSecret) {
+                cloudApiSecret.addEventListener('change', (e) => {
+                    window.WeatherManager.updateApiSettings('cloud', { apiSecret: e.target.value });
+                });
+            }
+            
+            if (localIp) {
+                localIp.addEventListener('change', (e) => {
+                    window.WeatherManager.updateApiSettings('local', { ip: e.target.value });
+                });
+            }
+            
+            if (localPort) {
+                localPort.addEventListener('change', (e) => {
+                    window.WeatherManager.updateApiSettings('local', { port: e.target.value });
+                });
+            }
+            
+            if (proxyUrl) {
+                proxyUrl.addEventListener('change', (e) => {
+                    window.WeatherManager.updateApiSettings('local', { proxyUrl: e.target.value });
+                });
+            }
+            
+            // HTTPS toggle
+            const httpsToggle = document.getElementById('weather-local-https-toggle');
+            if (httpsToggle) {
+                httpsToggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const isHttps = this.classList.contains('active');
+                    window.WeatherManager.updateApiSettings('local', { https: isHttps });
+                });
+            }
+            
+            // Update intervals
+            const liveInterval = document.getElementById('weather-live-interval');
+            const historyInterval = document.getElementById('weather-history-interval');
+            
+            if (liveInterval) {
+                liveInterval.addEventListener('change', (e) => {
+                    const live = parseInt(e.target.value);
+                    const history = parseInt(historyInterval.value);
+                    window.WeatherManager.updateIntervalSettings(live, history);
+                });
+            }
+            
+            if (historyInterval) {
+                historyInterval.addEventListener('change', (e) => {
+                    const live = parseInt(liveInterval.value);
+                    const history = parseInt(e.target.value);
+                    window.WeatherManager.updateIntervalSettings(live, history);
+                });
+            }
+            
+            // API testing
+            const testCloudBtn = document.getElementById('test-weather-cloud-api');
+            const testLocalBtn = document.getElementById('test-weather-local-api');
+            
+            if (testCloudBtn) {
+                testCloudBtn.addEventListener('click', async () => {
+                    const button = testCloudBtn;
+                    const result = document.getElementById('cloud-test-result');
+                    
+                    button.textContent = 'Testing...';
+                    button.disabled = true;
+                    result.textContent = '';
+                    
+                    try {
+                        const testResult = await window.WeatherManager.testCloudApi();
+                        if (testResult.success) {
+                            result.textContent = '✅ Success';
+                            result.style.color = '#44ff44';
+                        } else {
+                            result.textContent = `❌ ${testResult.error}`;
+                            result.style.color = '#ff6b6b';
+                        }
+                    } catch (error) {
+                        result.textContent = `❌ ${error.message}`;
+                        result.style.color = '#ff6b6b';
+                    } finally {
+                        button.textContent = 'Test Cloud API';
+                        button.disabled = false;
+                    }
+                });
+            }
+            
+            if (testLocalBtn) {
+                testLocalBtn.addEventListener('click', async () => {
+                    const button = testLocalBtn;
+                    const result = document.getElementById('local-test-result');
+                    
+                    button.textContent = 'Testing...';
+                    button.disabled = true;
+                    result.textContent = '';
+                    
+                    try {
+                        const testResult = await window.WeatherManager.testLocalApi();
+                        if (testResult.success) {
+                            result.textContent = '✅ Success';
+                            result.style.color = '#44ff44';
+                        } else {
+                            result.textContent = `❌ ${testResult.error}`;
+                            result.style.color = '#ff6b6b';
+                        }
+                    } catch (error) {
+                        result.textContent = `❌ ${error.message}`;
+                        result.style.color = '#ff6b6b';
+                    } finally {
+                        button.textContent = 'Test Local API';
+                        button.disabled = false;
+                    }
+                });
+            }
+            
+            // Data management
+            const exportDataBtn = document.getElementById('export-weather-data');
+            const exportCsvBtn = document.getElementById('export-weather-csv');
+            const clearDataBtn = document.getElementById('clear-weather-data');
+            const importDataBtn = document.getElementById('import-weather-data');
+            const importFile = document.getElementById('weather-import-file');
+            
+            if (exportDataBtn) {
+                exportDataBtn.addEventListener('click', () => {
+                    window.WeatherManager.exportWeatherData();
+                });
+            }
+            
+            if (exportCsvBtn) {
+                exportCsvBtn.addEventListener('click', () => {
+                    exportWeatherCSV();
+                });
+            }
+            
+            if (clearDataBtn) {
+                clearDataBtn.addEventListener('click', () => {
+                    if (confirm('Are you sure you want to clear all weather data? This cannot be undone.')) {
+                        window.WeatherManager.clearWeatherData();
+                        populateWeatherSettings();
+                    }
+                });
+            }
+            
+            if (importDataBtn) {
+                importDataBtn.addEventListener('click', () => {
+                    importFile.click();
+                });
+            }
+            
+            if (importFile) {
+                importFile.addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        try {
+                            await window.WeatherManager.importWeatherData(file);
+                            populateWeatherSettings();
+                            console.log('Weather data imported successfully');
+                        } catch (error) {
+                            console.error('Import failed:', error);
+                            alert('Import failed: ' + error.message);
+                        }
+                    }
+                    e.target.value = '';
+                });
+            }
+        }
+
+        function exportWeatherCSV() {
+            if (!window.WeatherManager) return;
+            
+            const historicalData = window.WeatherManager.getHistoricalData();
+            const widgetConfigs = window.WeatherManager.getWidgetConfigs();
+            
+            if (Object.keys(historicalData).length === 0) {
+                alert('No historical data to export');
+                return;
+            }
+            
+            // Create CSV headers
+            const headers = ['timestamp', ...Object.keys(widgetConfigs)];
+            let csvContent = headers.join(',') + '\n';
+            
+            // Add data rows
+            Object.entries(historicalData)
+                .sort(([a], [b]) => new Date(a) - new Date(b))
+                .forEach(([timestamp, data]) => {
+                    const row = [timestamp];
+                    Object.keys(widgetConfigs).forEach(key => {
+                        row.push(data[key] || '');
+                    });
+                    csvContent += row.join(',') + '\n';
+                });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `giant-sloth-weather-data-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            console.log('Weather CSV data exported');
+        }
+
+        // Initialize weather settings when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for WeatherManager to be available
+            setTimeout(() => {
+                if (window.WeatherManager) {
+                    setupWeatherSettingsEventListeners();
+                }
+            }, 100);
+        });
+    </script>
+    
+    <!-- Plant Database Loader -->
+    <script>
+        // Load plant database script dynamically
+        const script = document.createElement('script');
+        script.src = 'plantdatabase.js';
+        script.onload = () => {
+            console.log('📦 External plant database script loaded successfully');
+            setTimeout(() => {
+                if (window.PlantManager) {
+                    window.PlantManager.checkPlantDatabase();
+                }
+                // Also populate map dropdown when database loads
+                if (window.MapManager) {
+                    window.MapManager.populatePlantDropdown();
+                }
+            }, 100);
+        };
+        script.onerror = (error) => {
+            console.log('❌ External plant database script failed to load');
+            setTimeout(() => {
+                if (window.PlantManager) {
+                    window.PlantManager.checkPlantDatabase();
+                }
+            }, 100);
+        };
+        document.head.appendChild(script);
+    </script>
+    
+    <!-- Map Database Loader -->
+    <script>
+        // Load map database script dynamically
+        const mapScript = document.createElement('script');
+        mapScript.src = 'mapdata.js';
+        mapScript.onload = () => {
+            console.log('📍 External map database script loaded successfully');
+        };
+        mapScript.onerror = (error) => {
+            console.log('📍 No existing map database found - starting fresh');
+        };
+        document.head.appendChild(mapScript);
+    </script>
+</body>
+</html>
