@@ -1,4 +1,4 @@
-const plants = [
+plants = [
     // BANANAS
     {
         name: "Apple Banana",
