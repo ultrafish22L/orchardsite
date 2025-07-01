@@ -207,6 +207,11 @@ window.PlantManager = (function() {
         
         textContent += `
             <div class="notes-section">
+                <div class="detail-controls">
+                    <a href="#" class="more-resources" id="moreResourcesLink" target="_blank" style="display: none;">
+                        More Resources →
+                    </a>
+                </div>
                 <h3>Notes</h3>
                 <textarea class="notes-textarea" placeholder="Add your personal notes about this plant..." 
                           onchange="PlantManager.saveNote('${plant.name}', this.value)">${getNote(plant.name)}</textarea>
@@ -215,11 +220,14 @@ window.PlantManager = (function() {
         
         text.innerHTML = textContent;
         
-        if (plant.info_url) {
-            moreResourcesLink.href = plant.info_url;
-            moreResourcesLink.style.display = 'block';
-        } else {
-            moreResourcesLink.style.display = 'none';
+        // Get the new More Resources link from within the notes section
+        const newMoreResourcesLink = text.querySelector('#moreResourcesLink');
+        
+        if (plant.info_url && newMoreResourcesLink) {
+            newMoreResourcesLink.href = plant.info_url;
+            newMoreResourcesLink.style.display = 'block';
+        } else if (newMoreResourcesLink) {
+            newMoreResourcesLink.style.display = 'none';
         }
         
         overlay.style.display = 'flex';
