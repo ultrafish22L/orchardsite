@@ -207,7 +207,7 @@ window.PlantManager = (function() {
         
         textContent += `
             <div class="notes-section">
-                <h3>My Notes</h3>
+                <h3>Notes</h3>
                 <textarea class="notes-textarea" placeholder="Add your personal notes about this plant..." 
                           onchange="PlantManager.saveNote('${plant.name}', this.value)">${getNote(plant.name)}</textarea>
             </div>

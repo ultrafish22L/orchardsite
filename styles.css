@@ -1070,10 +1070,14 @@ body::before {
 .notes-section {
     margin-top: 0.75rem;
     padding-top: 0.75rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .notes-textarea {
     width: 100%;
+    flex: 1;
     min-height: 80px;
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid #40e0d0;
@@ -1081,7 +1085,7 @@ body::before {
     padding: 0.75rem;
     color: white;
     font-family: inherit;
-    resize: vertical;
+    resize: none;
     outline: none;
 }
 
@@ -1091,22 +1095,39 @@ body::before {
 
 .detail-controls {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 1.5rem;
+    right: 1.5rem;
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
 }
 
 .more-resources {
-    color: #7fffd4;
+    background: rgba(127, 255, 212, 0.08);
+    border: 1px solid rgba(127, 255, 212, 0.4);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.9rem;
+    backdrop-filter: blur(15px);
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.2),
+        0 2px 8px rgba(127, 255, 212, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     text-decoration: none;
-    font-size: 1.1rem;
-    transition: color 0.3s ease;
+    display: inline-block;
 }
 
 .more-resources:hover {
-    color: #40e0d0;
+    background: rgba(127, 255, 212, 0.15);
+    border-color: #7fffd4;
+    transform: translateY(-2px);
+    box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.3),
+        0 4px 12px rgba(127, 255, 212, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .photo-modal {
