@@ -178,8 +178,19 @@ window.PlantManager = (function() {
                      onclick="PlantManager.openPhotoModal('${img.url}')" 
                      onerror="this.style.display='none';">
             `).join('');
+            
+            // Add class based on number of images
+            images.className = 'detail-images';
+            if (imageUrls.length === 1) {
+                images.classList.add('single-photo');
+            } else if (imageUrls.length === 2) {
+                images.classList.add('two-photos');
+            } else if (imageUrls.length >= 3) {
+                images.classList.add('three-photos');
+            }
         } else {
             images.innerHTML = `<div style="font-size: 6rem; text-align: center; padding: 2rem; display: flex; align-items: center; justify-content: center;">${plant.emoji || '🌱'}</div>`;
+            images.className = 'detail-images single-photo';
         }
         
         let textContent = `
