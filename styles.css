@@ -1081,7 +1081,7 @@ body::before {
 }
 
 .notes-textarea {
-    width: calc(100% - 1.5rem);
+    width: 100%;
     flex: 1;
     min-height: 80px;
     max-height: 200px;
