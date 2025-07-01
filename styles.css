@@ -1018,6 +1018,7 @@ body::before {
     overflow: hidden;
     min-height: 0;
     align-items: start;
+    padding-bottom: 1rem;
 }
 
 .detail-images {
@@ -1041,8 +1042,10 @@ body::before {
 .detail-text {
     display: flex;
     flex-direction: column;
-    height: fit-content;
+    height: 100%;
     position: relative;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .detail-image:hover {
@@ -1073,20 +1076,25 @@ body::before {
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-height: 0;
+    padding-bottom: 3rem;
 }
 
 .notes-textarea {
-    width: 100%;
+    width: calc(100% - 1.5rem);
     flex: 1;
     min-height: 80px;
+    max-height: 200px;
     background: rgba(0, 0, 0, 0.3);
     border: 1px solid #40e0d0;
     border-radius: 10px;
     padding: 0.75rem;
+    margin: 0;
     color: white;
     font-family: inherit;
     resize: none;
     outline: none;
+    box-sizing: border-box;
 }
 
 .notes-textarea::placeholder {
