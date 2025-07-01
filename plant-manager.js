@@ -189,7 +189,7 @@ window.PlantManager = (function() {
                 images.classList.add('three-photos');
             }
         } else {
-            images.innerHTML = `<div style="font-size: 6rem; text-align: center; padding: 2rem; display: flex; align-items: center; justify-content: center;">${plant.emoji || '🌱'}</div>`;
+            images.innerHTML = `<div class="detail-emoji-icon">${plant.emoji || '🌱'}</div>`;
             images.className = 'detail-images single-photo';
         }
         
