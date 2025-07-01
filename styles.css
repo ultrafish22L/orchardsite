@@ -1054,30 +1054,34 @@ body::before {
 
 .detail-text h2 {
     color: #7fffd4;
-    margin-bottom: 0.5rem;
+    margin: 0 0 0.3rem 0;
     font-size: 1.8rem;
 }
 
 .detail-text h3 {
     color: #40e0d0;
-    margin: 1rem 0 0.3rem 0;
+    margin: 0.6rem 0 0.2rem 0;
     font-size: 1.2rem;
 }
 
 .detail-text p {
-    line-height: 1.4;
-    margin-bottom: 0.6rem;
+    line-height: 1.3;
+    margin: 0 0 0.4rem 0;
     color: rgba(255, 255, 255, 0.9);
 }
 
 .notes-section {
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
     padding-bottom: 3rem;
+}
+
+.notes-section h3 {
+    margin: 0 0 0.4rem 0;
 }
 
 .notes-textarea {
