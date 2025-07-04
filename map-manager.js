@@ -678,6 +678,13 @@ window.MapManager = (function() {
             console.log('✅ Delete button listener added');
         }
         
+        // Print button
+        const printBtn = document.getElementById('map-print-btn');
+        if (printBtn) {
+            printBtn.addEventListener('click', printMap);
+            console.log('✅ Print button listener added');
+        }
+        
         // Edit mode controls
         const cancelBtn = document.getElementById('map-cancel-btn');
         const confirmBtn = document.getElementById('map-confirm-btn');
@@ -731,6 +738,71 @@ window.MapManager = (function() {
         if (el) el.classList.add('hidden');
     }
 
+    function printMap() {
+        console.log('🖨️ Printing map in 2 pages (portrait, rotated 90°)...');
+        
+        // Ensure we're on the map page
+        const mapContent = document.getElementById('mapContent');
+        if (!mapContent || mapContent.classList.contains('hidden')) {
+            console.warn('⚠️ Map not currently visible, cannot print');
+            return;
+        }
+        
+        // Add a temporary print class to the body for enhanced print styling
+        document.body.classList.add('printing-map');
+        
+        // Create a temporary print-specific container
+        const printContainer = document.createElement('div');
+        printContainer.className = 'map-print-container';
+        printContainer.innerHTML = `
+            <div class="map-print-page map-print-page-1">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #000;">Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
+                <div class="map-print-content" id="map-print-content-1"></div>
+            </div>
+            <div class="map-print-page map-print-page-2" style="page-break-before: always;">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #000;">Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
+                <div class="map-print-content" id="map-print-content-2"></div>
+            </div>
+        `;
+        
+        // Clone the map container for printing
+        const mapContainer = document.getElementById('mapContainer');
+        if (mapContainer) {
+            const mapClone1 = mapContainer.cloneNode(true);
+            const mapClone2 = mapContainer.cloneNode(true);
+            
+            // Add print-specific styling
+            mapClone1.style.transform = 'rotate(90deg) scale(0.8)';
+            mapClone1.style.transformOrigin = 'center center';
+            mapClone1.style.clipPath = 'inset(0 0 50% 0)'; // Show top half
+            
+            mapClone2.style.transform = 'rotate(90deg) scale(0.8)';
+            mapClone2.style.transformOrigin = 'center center';
+            mapClone2.style.clipPath = 'inset(50% 0 0 0)'; // Show bottom half
+            mapClone2.style.marginTop = '-50%'; // Adjust positioning for bottom half
+            
+            document.getElementById('map-print-content-1').appendChild(mapClone1);
+            document.getElementById('map-print-content-2').appendChild(mapClone2);
+        }
+        
+        // Temporarily add print container to body
+        document.body.appendChild(printContainer);
+        
+        // Trigger print dialog
+        setTimeout(() => {
+            window.print();
+            
+            // Clean up after printing
+            setTimeout(() => {
+                document.body.removeChild(printContainer);
+                document.body.classList.remove('printing-map');
+                console.log('✅ Print cleanup completed');
+            }, 1000);
+        }, 500);
+        
+        console.log('✅ Print dialog opened');
+    }
+
     // Public API
     return {
         // Core functions
@@ -764,6 +836,7 @@ window.MapManager = (function() {
         
         // Utility functions
         showElement: showElement,
-        hideElement: hideElement
+        hideElement: hideElement,
+        printMap: printMap
     };
 })();
