@@ -114,8 +114,8 @@ window.MapManager = (function() {
     function handleMapClick(event) {
         console.log('🖱️ Map clicked in mode:', mapMode, 'tempPlantData:', !!tempPlantData);
         
-        if (mapMode === 'edit') {
-            // In edit mode, place plant at cursor position if none exists
+        if (mapMode === 'add') {
+            // In add mode, place plant at cursor position if none exists
             if (!tempPlantData) {
                 console.log('🌱 Placing new temp plant...');
                 const rect = event.currentTarget.getBoundingClientRect();
@@ -126,6 +126,24 @@ window.MapManager = (function() {
                 event.preventDefault();
             } else {
                 console.log('⚠️ Temp plant already exists, ignoring click');
+            }
+            return;
+        }
+
+        if (mapMode === 'edit') {
+            // In edit mode, clicking selects plants for dragging
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            const clickedPlant = findPlantAtPosition(x, y);
+            
+            if (clickedPlant && clickedPlant.id !== 'temp') {
+                console.log('✏️ Plant selected for editing:', clickedPlant.name);
+                selectedPlant = clickedPlant.id;
+                event.preventDefault();
+            } else {
+                console.log('🕳️ Empty area clicked - deselecting');
+                selectedPlant = null;
             }
             return;
         }
@@ -164,8 +182,8 @@ window.MapManager = (function() {
     }
 
     function handleMouseDown(event) {
-        if (mapMode === 'edit') {
-            // In edit mode, only start dragging if clicking on the temp plant
+        if (mapMode === 'add') {
+            // In add mode, only start dragging if clicking on the temp plant
             if (tempPlantData) {
                 const rect = event.currentTarget.getBoundingClientRect();
                 const x = event.clientX - rect.left;
@@ -179,21 +197,44 @@ window.MapManager = (function() {
                     event.preventDefault();
                 }
             }
+        } else if (mapMode === 'edit') {
+            // In edit mode, start dragging if clicking on a selected plant
+            if (selectedPlant && placedPlants[selectedPlant]) {
+                const rect = event.currentTarget.getBoundingClientRect();
+                const x = event.clientX - rect.left;
+                const y = event.clientY - rect.top;
+                
+                const plant = placedPlants[selectedPlant];
+                const distance = Math.sqrt(
+                    Math.pow(x - plant.x, 2) + Math.pow(y - plant.y, 2)
+                );
+                if (distance <= plant.radius) {
+                    isDragging = true;
+                    event.preventDefault();
+                }
+            }
         }
         // In normal mode, don't allow dragging - only clicking for details
     }
 
     function handleMouseMove(event) {
-        if (!isDragging || !tempPlantData) return;
+        if (!isDragging) return;
         
         const rect = event.currentTarget.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         
-        // Update temp plant position
-        tempPlantData.x = x;
-        tempPlantData.y = y;
-        renderMapPlants();
+        if (mapMode === 'add' && tempPlantData) {
+            // Update temp plant position
+            tempPlantData.x = x;
+            tempPlantData.y = y;
+            renderMapPlants();
+        } else if (mapMode === 'edit' && selectedPlant && placedPlants[selectedPlant]) {
+            // Update existing plant position
+            placedPlants[selectedPlant].x = x;
+            placedPlants[selectedPlant].y = y;
+            renderMapPlants();
+        }
     }
 
     function handleMouseUp(event) {
@@ -289,7 +330,7 @@ window.MapManager = (function() {
     }
 
     function startAddPlant() {
-        console.log('🚀 Starting add plant process...');
+        console.log('🚀 Starting add mode...');
         console.log('📊 Current state:', { mapMode, tempPlantData });
         
         const dropdown = document.getElementById('map-plant-select');
@@ -300,43 +341,128 @@ window.MapManager = (function() {
         }
         
         selectedPlantForAddition = dropdown.value;
-        mapMode = 'edit';
+        mapMode = 'add';
         tempPlantData = null; // Reset temp plant data
         isDragging = false; // Reset dragging state
         
-        console.log('✅ Entering edit mode:', { selectedPlantForAddition, mapMode });
+        console.log('✅ Entering add mode:', { selectedPlantForAddition, mapMode });
         
-        // Show edit controls
-        showElement('map-edit-controls');
-        hideElement('map-add-btn');
-        hideElement('map-delete-btn');
+        // Hide all buttons except check and X
+        hideAllButtonsExceptConfirmCancel();
         
-        // Change cursor to indicate edit mode
+        // Change cursor to indicate add mode
         const mapContainer = document.getElementById('mapContainer');
         if (mapContainer) {
             mapContainer.style.cursor = 'crosshair';
         }
         
-        console.log('✏️ Edit mode activated for:', selectedPlantForAddition);
+        console.log('➕ Add mode activated for:', selectedPlantForAddition);
+    }
+
+    function startEditMode() {
+        console.log('🚀 Starting edit mode...');
+        
+        mapMode = 'edit';
+        selectedPlant = null; // Clear selection
+        tempPlantData = null; // Reset temp plant data
+        isDragging = false; // Reset dragging state
+        
+        console.log('✅ Entering edit mode');
+        
+        // Hide all buttons except check and X
+        hideAllButtonsExceptConfirmCancel();
+        
+        // Change cursor to indicate edit mode
+        const mapContainer = document.getElementById('mapContainer');
+        if (mapContainer) {
+            mapContainer.style.cursor = 'move';
+        }
+        
+        console.log('✏️ Edit mode activated - click and drag plants to reposition');
+    }
+
+    function cancelEditMode() {
+        console.log('❌ Canceling edit mode');
+        mapMode = 'normal';
+        selectedPlant = null;
+        tempPlantData = null;
+        isDragging = false;
+
+        // Show all buttons, hide confirm/cancel
+        showAllButtons();
+
+        // Reset cursor
+        const mapContainer = document.getElementById('mapContainer');
+        if (mapContainer) {
+            mapContainer.style.cursor = 'default';
+        }
+
+        // Re-render to restore original positions
+        renderMapPlants();
+        console.log('✅ Edit mode canceled');
+    }
+
+    function confirmEditMode() {
+        console.log('✅ Confirming edit mode');
+        mapMode = 'normal';
+        selectedPlant = null;
+        tempPlantData = null;
+        isDragging = false;
+
+        // Show all buttons, hide confirm/cancel
+        showAllButtons();
+
+        // Reset cursor
+        const mapContainer = document.getElementById('mapContainer');
+        if (mapContainer) {
+            mapContainer.style.cursor = 'default';
+        }
+
+        // Save changes
+        savePlantPlacements();
+        renderMapPlants();
+        console.log('✅ Edit mode confirmed - changes saved');
+    }
+
+    function hideAllButtonsExceptConfirmCancel() {
+        // Hide all primary buttons
+        hideElement('map-plant-select');
+        hideElement('map-add-btn');
+        hideElement('map-edit-btn');
+        hideElement('map-delete-btn');
+        hideElement('map-print-btn');
+        
+        // Show only confirm/cancel controls
+        showElement('map-edit-controls');
+    }
+
+    function showAllButtons() {
+        // Show all primary buttons
+        showElement('map-plant-select');
+        showElement('map-add-btn');
+        showElement('map-edit-btn');
+        showElement('map-delete-btn');
+        showElement('map-print-btn');
+        
+        // Hide confirm/cancel controls
+        hideElement('map-edit-controls');
     }
 
     function cancelAddPlant() {
-        console.log('❌ Canceling adding plant');
+        console.log('❌ Canceling add mode');
         mapMode = 'normal';
         selectedPlantForAddition = '';
         tempPlantData = null; // Reset temp plant data
 
-        // Hide edit controls
-        hideElement('map-edit-controls');
-        showElement('map-add-btn');
-        showElement('map-delete-btn');
+        // Show all buttons, hide confirm/cancel
+        showAllButtons();
         
         // Reset cursor
         const mapContainer = document.getElementById('mapContainer');
         if (mapContainer) {
             mapContainer.style.cursor = 'default';
         }
-        console.log('❌ Cancelled adding plant');
+        console.log('✅ Add mode canceled');
 
         // Render existing plants
         renderMapPlants();
@@ -380,7 +506,14 @@ window.MapManager = (function() {
     }
 
     function confirmAddPlant() {
-        // This would be called after placing the plant
+        console.log('✅ Confirming add mode');
+        
+        if (!tempPlantData) {
+            console.log('❌ No plant to add');
+            alert('Please place a plant on the map first');
+            return;
+        }
+        
         mapMode = 'normal';
         selectedPlantForAddition = '';
 
@@ -388,10 +521,8 @@ window.MapManager = (function() {
         placedPlants[plantId] = tempPlantData;
         tempPlantData = null; // Reset temp plant data
 
-        // Hide edit controls
-        hideElement('map-edit-controls');
-        showElement('map-add-btn');
-        showElement('map-delete-btn');
+        // Show all buttons, hide confirm/cancel
+        showAllButtons();
         
         // Reset cursor
         const mapContainer = document.getElementById('mapContainer');
@@ -400,6 +531,7 @@ window.MapManager = (function() {
         }
         
         savePlantPlacements();
+        renderMapPlants();
         console.log('✅ Plant added successfully');
     }
 
@@ -444,8 +576,8 @@ window.MapManager = (function() {
         }
     }
 
-    function deletePlant() {
-        console.log('🚀 Starting delete plant process...');
+    function startDeleteMode() {
+        console.log('🚀 Starting delete mode...');
         
         mapMode = 'delete';
         tempDeleteList = {}; // Reset delete list
@@ -453,10 +585,8 @@ window.MapManager = (function() {
         
         console.log('✅ Entering delete mode');
         
-        // Show edit controls (reused for delete mode)
-        showElement('map-edit-controls');
-        hideElement('map-add-btn');
-        hideElement('map-delete-btn');
+        // Hide all buttons except check and X
+        hideAllButtonsExceptConfirmCancel();
         
         // Change cursor to indicate delete mode
         const mapContainer = document.getElementById('mapContainer');
@@ -494,10 +624,8 @@ window.MapManager = (function() {
         // Return to normal mode
         mapMode = 'normal';
         
-        // Hide edit controls
-        hideElement('map-edit-controls');
-        showElement('map-add-btn');
-        showElement('map-delete-btn');
+        // Show all buttons, hide confirm/cancel
+        showAllButtons();
         
         // Reset cursor
         const mapContainer = document.getElementById('mapContainer');
@@ -520,10 +648,8 @@ window.MapManager = (function() {
         // Return to normal mode
         mapMode = 'normal';
         
-        // Hide edit controls
-        hideElement('map-edit-controls');
-        showElement('map-add-btn');
-        showElement('map-delete-btn');
+        // Show all buttons, hide confirm/cancel
+        showAllButtons();
         
         // Reset cursor
         const mapContainer = document.getElementById('mapContainer');
@@ -533,7 +659,7 @@ window.MapManager = (function() {
         
         // Re-render to restore plants
         renderMapPlants();
-        console.log('❌ Plant deletion cancelled');
+        console.log('✅ Delete mode canceled');
     }
 
     function renderMapPlants() {
@@ -671,10 +797,17 @@ window.MapManager = (function() {
             console.log('✅ Add button listener added');
         }
         
+        // Edit button
+        const editBtn = document.getElementById('map-edit-btn');
+        if (editBtn) {
+            editBtn.addEventListener('click', startEditMode);
+            console.log('✅ Edit button listener added');
+        }
+        
         // Delete button
         const deleteBtn = document.getElementById('map-delete-btn');
         if (deleteBtn) {
-            deleteBtn.addEventListener('click', deletePlant);
+            deleteBtn.addEventListener('click', startDeleteMode);
             console.log('✅ Delete button listener added');
         }
         
@@ -695,8 +828,10 @@ window.MapManager = (function() {
                 console.log('🔴 Cancel button clicked!');
                 e.preventDefault();
                 e.stopPropagation();
-                if (mapMode === 'edit') {
+                if (mapMode === 'add') {
                     cancelAddPlant();
+                } else if (mapMode === 'edit') {
+                    cancelEditMode();
                 } else if (mapMode === 'delete') {
                     cancelDeletePlants();
                 }
@@ -713,8 +848,10 @@ window.MapManager = (function() {
                 console.log('🟢 Confirm button clicked!');
                 e.preventDefault();
                 try {
-                    if (mapMode === 'edit') {
+                    if (mapMode === 'add') {
                         confirmAddPlant();
+                    } else if (mapMode === 'edit') {
+                        confirmEditMode();
                     } else if (mapMode === 'delete') {
                         confirmDeletePlants();
                     }
@@ -1028,8 +1165,10 @@ window.MapManager = (function() {
         
         // Cancel edit mode (called by app when navigating away)
         cancelEditMode: function() {
-            if (mapMode === 'edit') {
+            if (mapMode === 'add') {
                 cancelAddPlant();
+            } else if (mapMode === 'edit') {
+                cancelEditMode();
             } else if (mapMode === 'delete') {
                 cancelDeletePlants();
             }
