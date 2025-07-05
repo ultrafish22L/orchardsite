@@ -835,58 +835,87 @@ window.MapManager = (function() {
     
     function styleMapForPrint(mapClone, pageNumber) {
         // Reset any transforms and make visible
-        mapClone.style.transform = 'none';
-        mapClone.style.position = 'relative';
-        mapClone.style.width = '100%';
-        mapClone.style.height = 'auto';
-        mapClone.style.maxWidth = 'none';
-        mapClone.style.maxHeight = 'none';
-        mapClone.style.overflow = 'visible';
-        mapClone.style.background = 'white';
+        mapClone.style.cssText = `
+            position: relative !important;
+            width: 100% !important;
+            height: 600px !important;
+            background: white !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            overflow: hidden !important;
+            border: 1px solid #ccc !important;
+        `;
         
-        // Apply page-specific clipping
+        // Apply page-specific clipping and rotation
         if (pageNumber === 1) {
-            // Show top half
+            // Show top half, rotated
+            mapClone.style.transform = 'rotate(90deg) scale(0.8)';
+            mapClone.style.transformOrigin = 'center center';
             mapClone.style.clipPath = 'inset(0 0 50% 0)';
-            mapClone.style.marginBottom = '-50%';
         } else {
-            // Show bottom half
+            // Show bottom half, rotated
+            mapClone.style.transform = 'rotate(90deg) scale(0.8)';
+            mapClone.style.transformOrigin = 'center center';
             mapClone.style.clipPath = 'inset(50% 0 0 0)';
-            mapClone.style.marginTop = '-50%';
         }
         
-        // Rotate the map 90 degrees for landscape orientation in portrait page
-        mapClone.style.transform = 'rotate(90deg) scale(0.7)';
-        mapClone.style.transformOrigin = 'center center';
-        
-        // Ensure all plant markers are visible
-        const plantMarkers = mapClone.querySelectorAll('.plant-marker');
-        plantMarkers.forEach(marker => {
-            marker.style.display = 'block';
-            marker.style.visibility = 'visible';
-            marker.style.opacity = '1';
-            marker.style.position = 'absolute';
-            marker.style.zIndex = '10';
-            
-            // Make sure text is readable
-            const label = marker.querySelector('.plant-label');
-            if (label) {
-                label.style.color = '#000';
-                label.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-                label.style.padding = '2px 4px';
-                label.style.borderRadius = '3px';
-                label.style.fontSize = '12px';
-                label.style.fontWeight = 'bold';
-            }
+        // Force all child elements to be visible
+        const allElements = mapClone.querySelectorAll('*');
+        allElements.forEach(element => {
+            element.style.visibility = 'visible !important';
+            element.style.display = element.style.display === 'none' ? 'block' : element.style.display;
+            element.style.opacity = '1';
         });
         
         // Ensure map background image is visible
         const mapImg = mapClone.querySelector('img');
         if (mapImg) {
-            mapImg.style.display = 'block';
-            mapImg.style.width = '100%';
-            mapImg.style.height = 'auto';
+            mapImg.style.cssText = `
+                display: block !important;
+                visibility: visible !important;
+                width: 100% !important;
+                height: auto !important;
+                opacity: 1 !important;
+            `;
         }
+        
+        // Ensure all plant markers are visible and styled for print
+        const plantMarkers = mapClone.querySelectorAll('.plant-marker');
+        plantMarkers.forEach(marker => {
+            marker.style.cssText = `
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: absolute !important;
+                z-index: 10 !important;
+                background: rgba(255, 255, 255, 0.9) !important;
+                border: 2px solid #000 !important;
+                border-radius: 50% !important;
+                padding: 4px !important;
+                font-size: 12px !important;
+                font-weight: bold !important;
+                color: #000 !important;
+                min-width: 24px !important;
+                min-height: 24px !important;
+                text-align: center !important;
+            `;
+            
+            // Make sure text labels are readable
+            const label = marker.querySelector('.plant-label');
+            if (label) {
+                label.style.cssText = `
+                    color: #000 !important;
+                    background-color: rgba(255, 255, 255, 0.95) !important;
+                    padding: 2px 4px !important;
+                    border-radius: 3px !important;
+                    font-size: 10px !important;
+                    font-weight: bold !important;
+                    display: block !important;
+                    visibility: visible !important;
+                `;
+            }
+        });
     }
 
     // Public API

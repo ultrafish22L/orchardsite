@@ -1557,41 +1557,42 @@ body::before {
 
 /* Print Styles for Map */
 @media print {
-    body.printing-map * {
-        visibility: hidden;
+    /* Hide everything except print container when printing map */
+    body.printing-map > *:not(.map-print-container) {
+        display: none !important;
     }
     
-    body.printing-map .map-print-container,
-    body.printing-map .map-print-container * {
-        visibility: visible !important;
+    body.printing-map {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
     }
     
     .map-print-container {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background: white;
-        z-index: 9999;
+        position: static !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: white !important;
+        display: block !important;
+        visibility: visible !important;
     }
     
     .map-print-page {
-        width: 100%;
-        height: 100vh;
-        page-break-after: always;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 20px;
-        box-sizing: border-box;
-        background: white;
-        overflow: hidden;
+        width: 100% !important;
+        height: 100vh !important;
+        page-break-after: always !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        padding: 20px !important;
+        box-sizing: border-box !important;
+        background: white !important;
+        overflow: hidden !important;
     }
     
     .map-print-page:last-child {
-        page-break-after: avoid;
+        page-break-after: avoid !important;
     }
     
     .print-title {
@@ -1600,22 +1601,30 @@ body::before {
         margin: 0 0 20px 0 !important;
         text-align: center !important;
         font-weight: bold !important;
+        display: block !important;
+        visibility: visible !important;
     }
     
     .map-print-content {
-        width: 100%;
-        height: calc(100vh - 80px);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
+        width: 100% !important;
+        height: calc(100vh - 80px) !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        overflow: hidden !important;
+        background: white !important;
     }
     
-    .map-print-content > div {
-        width: 100% !important;
-        height: 100% !important;
+    .map-print-content > * {
         display: block !important;
         visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* Force all map content to be visible */
+    .map-print-content * {
+        visibility: visible !important;
+        opacity: 1 !important;
     }
     
     /* Ensure map images are visible in print */
@@ -1634,11 +1643,15 @@ body::before {
         opacity: 1 !important;
         position: absolute !important;
         z-index: 10 !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+        border: 2px solid #000 !important;
+        border-radius: 50% !important;
+        color: #000 !important;
     }
     
     .map-print-content .plant-label {
         color: #000 !important;
-        background-color: rgba(255, 255, 255, 0.9) !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
         padding: 2px 4px !important;
         border-radius: 3px !important;
         font-size: 10px !important;
