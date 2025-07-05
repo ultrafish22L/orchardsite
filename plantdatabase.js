@@ -857,7 +857,7 @@ plants = [
         botanical: "Capsicum frutescens",
         category: "herbs",
         info_url: "https://www.hawaiigardener.com/hawaiian-chili-peppers",
-        plant_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Capsicum_frutescens_plant.jpg/512px-Capsicum_frutescens_plant.jpg",
+        plant_photo: "https://images.squarespace-cdn.com/content/v1/5f07ae4d4108ac39ff2d21b4/1595552981870-4OEN3LH2CNMWKWRQMC53/hawaiian-chili-pepper-growing-PNG2.png?format=2500w",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Capsicum_frutescens_fruits.jpg/512px-Capsicum_frutescens_fruits.jpg",
         emoji: "🌶️",
         rare: false,
