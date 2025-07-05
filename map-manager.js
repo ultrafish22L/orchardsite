@@ -814,30 +814,31 @@ window.MapManager = (function() {
                     
                     .map-content {
                         flex: 1;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
                         overflow: hidden;
                         background: white;
                         border: 1px solid #ccc;
                         position: relative;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
                     }
                     
                     .map-image {
-                        max-width: 100%;
-                        max-height: 100%;
+                        width: 800px;
+                        height: auto;
                         transform: rotate(90deg);
-                        object-fit: contain;
+                        transform-origin: center center;
+                        position: absolute;
                     }
                     
-                    /* Page 1 shows top half */
+                    /* Page 1 shows top half - shift image up */
                     .page-1 .map-image {
-                        clip-path: inset(0 0 50% 0);
+                        top: 25%;
                     }
                     
-                    /* Page 2 shows bottom half */
+                    /* Page 2 shows bottom half - shift image down */
                     .page-2 .map-image {
-                        clip-path: inset(50% 0 0 0);
+                        top: -25%;
                     }
                 </style>
             </head>
