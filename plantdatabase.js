@@ -1529,6 +1529,7 @@ plants = [
         category: "fruit",
         info_url: "https://en.wikipedia.org/wiki/Purple_mangosteen",
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Pokok_manggis.jpg",
+        flower_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Garcinia_mangostana_flowers.jpg/512px-Garcinia_mangostana_flowers.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Mangosteen_Basket.jpg",
         emoji: "👑",
         rare: true,
