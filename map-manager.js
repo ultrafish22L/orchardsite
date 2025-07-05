@@ -754,9 +754,16 @@ window.MapManager = (function() {
             return;
         }
         
-        // Get the map image source
+        // Get the map image source - ensure it's a full URL
         const mapImg = mapContainer.querySelector('img');
-        const mapSrc = mapImg ? mapImg.src : 'giantslothorchard_map.png';
+        let mapSrc = mapImg ? mapImg.src : 'giantslothorchard_map.png';
+        
+        // Ensure we have a full URL for the image
+        if (!mapSrc.startsWith('http')) {
+            mapSrc = window.location.origin + '/' + mapSrc.replace(/^\//, '');
+        }
+        
+        console.log('🖼️ Using map image:', mapSrc);
         
         // Create a simple print window
         const printWindow = window.open('', '_blank', 'width=800,height=600');
@@ -775,7 +782,7 @@ window.MapManager = (function() {
                     
                     body {
                         margin: 0;
-                        padding: 20px;
+                        padding: 0;
                         font-family: Arial, sans-serif;
                         background: white;
                         color: black;
@@ -787,12 +794,10 @@ window.MapManager = (function() {
                         page-break-after: always;
                         display: flex;
                         flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
                         background: white;
-                        overflow: hidden;
                         box-sizing: border-box;
                         padding: 20px;
+                        position: relative;
                     }
                     
                     .print-page:last-child {
@@ -805,37 +810,34 @@ window.MapManager = (function() {
                         margin: 0 0 20px 0;
                         text-align: center;
                         font-weight: bold;
-                        position: absolute;
-                        top: 20px;
-                        left: 50%;
-                        transform: translateX(-50%);
                     }
                     
                     .map-content {
-                        width: 100%;
-                        height: 100%;
+                        flex: 1;
                         display: flex;
                         justify-content: center;
                         align-items: center;
                         overflow: hidden;
                         background: white;
+                        border: 1px solid #ccc;
                         position: relative;
                     }
                     
                     .map-image {
-                        width: auto;
-                        height: 200vh;
+                        max-width: 100%;
+                        max-height: 100%;
                         transform: rotate(90deg);
-                        transform-origin: center center;
-                        position: relative;
+                        object-fit: contain;
                     }
                     
-                    .map-content.page-1 .map-image {
-                        top: 50vh;
+                    /* Page 1 shows top half */
+                    .page-1 .map-image {
+                        clip-path: inset(0 0 50% 0);
                     }
                     
-                    .map-content.page-2 .map-image {
-                        top: -50vh;
+                    /* Page 2 shows bottom half */
+                    .page-2 .map-image {
+                        clip-path: inset(50% 0 0 0);
                     }
                 </style>
             </head>
@@ -843,14 +845,14 @@ window.MapManager = (function() {
                 <div class="print-page">
                     <h2 class="print-title">Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
                     <div class="map-content page-1">
-                        <img class="map-image" src="${mapSrc}" alt="Farm Map">
+                        <img class="map-image" src="${mapSrc}" alt="Farm Map" onload="console.log('Map image loaded successfully')" onerror="console.error('Failed to load map image:', this.src)">
                     </div>
                 </div>
                 
                 <div class="print-page">
                     <h2 class="print-title">Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
                     <div class="map-content page-2">
-                        <img class="map-image" src="${mapSrc}" alt="Farm Map">
+                        <img class="map-image" src="${mapSrc}" alt="Farm Map" onload="console.log('Map image loaded successfully')" onerror="console.error('Failed to load map image:', this.src)">
                     </div>
                 </div>
             </body>
