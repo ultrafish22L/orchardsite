@@ -109,6 +109,13 @@ window.MapManager = (function() {
             option.textContent = `${plant.emoji || '🌱'} ${plant.name}`;
             dropdown.appendChild(option);
         });
+        
+        // Default to Apple Banana if it exists
+        const appleBanana = availablePlants.find(plant => plant.name === 'Apple Banana');
+        if (appleBanana) {
+            dropdown.value = 'Apple Banana';
+            console.log('🍌 Plant dropdown defaulted to Apple Banana');
+        }
     }
 
     function handleMapClick(event) {
