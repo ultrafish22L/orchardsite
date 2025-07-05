@@ -123,11 +123,15 @@ window.PlantManager = (function() {
         }
         
         showElement('plantGrid');
-        grid.innerHTML = filteredPlants.map((plant, index) => `
+        grid.innerHTML = filteredPlants.map((plant, index) => {
+            // Priority order: plant_photo, flower_photo, fruit_photo
+            const photoUrl = plant.plant_photo || plant.flower_photo || plant.fruit_photo;
+            
+            return `
             <div class="plant-card" onclick="PlantManager.openPlantDetail(${index})">
                 <div class="plant-image">
-                    ${plant.plant_photo ? 
-                        `<img src="${plant.plant_photo}" alt="${plant.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    ${photoUrl ? 
+                        `<img src="${photoUrl}" alt="${plant.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                          <div style="display: none; font-size: 3rem;">${plant.emoji || '🌱'}</div>` :
                         `<div style="font-size: 3rem;">${plant.emoji || '🌱'}</div>`
                     }
@@ -135,7 +139,8 @@ window.PlantManager = (function() {
                 <h3>${plant.name}</h3>
                 <p>${plant.botanical}</p>
             </div>
-        `).join('');
+            `;
+        }).join('');
         
         console.log('✅ Plants rendered successfully:', filteredPlants.length);
     }
