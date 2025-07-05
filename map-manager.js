@@ -824,21 +824,24 @@ window.MapManager = (function() {
                     }
                     
                     .map-image {
-                        width: 800px;
+                        width: 200%;
                         height: auto;
                         transform: rotate(90deg);
                         transform-origin: center center;
                         position: absolute;
+                        object-fit: contain;
                     }
                     
-                    /* Page 1 shows top half - shift image up */
+                    /* Page 1 shows top half - shift image down to show top portion */
                     .page-1 .map-image {
-                        top: 25%;
+                        top: 50%;
+                        transform: rotate(90deg) translateY(-25%);
                     }
                     
-                    /* Page 2 shows bottom half - shift image down */
+                    /* Page 2 shows bottom half - shift image up to show bottom portion */
                     .page-2 .map-image {
-                        top: -25%;
+                        top: -50%;
+                        transform: rotate(90deg) translateY(25%);
                     }
                 </style>
             </head>
