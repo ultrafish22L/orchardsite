@@ -79,11 +79,32 @@ window.PlantManager = (function() {
         let filtered = window.plantsDatabase;
         
         if (currentCategory === 'wishlist') {
+            // Wishlist: only plants that are ONLY in wishlist (no multi-category wishlist plants)
             filtered = filtered.filter(plant => plant.category === 'wishlist');
         } else if (currentCategory !== 'all') {
-            filtered = filtered.filter(plant => plant.category === currentCategory);
+            // Specific category: exclude wishlist plants entirely, then filter by category
+            filtered = filtered.filter(plant => {
+                // First exclude any wishlist plants
+                if (plant.category === 'wishlist' || 
+                    (plant.category && plant.category.split(',').includes('wishlist'))) {
+                    return false;
+                }
+                
+                // Then check if plant matches current category
+                if (plant.category.includes(',')) {
+                    // Multi-category plant - check if current category is in the list
+                    return plant.category.split(',').includes(currentCategory);
+                } else {
+                    // Single category plant - exact match
+                    return plant.category === currentCategory;
+                }
+            });
         } else {
-            filtered = filtered.filter(plant => plant.category !== 'wishlist');
+            // All: exclude wishlist plants entirely
+            filtered = filtered.filter(plant => 
+                plant.category !== 'wishlist' && 
+                !(plant.category && plant.category.split(',').includes('wishlist'))
+            );
         }
         
         if (searchTerm) {
@@ -152,8 +173,14 @@ window.PlantManager = (function() {
             return;
         }
         
-        const totalPlants = window.plantsDatabase.filter(plant => plant.category !== 'wishlist').length;
-        const wishlistCount = window.plantsDatabase.filter(plant => plant.category === 'wishlist').length;
+        const totalPlants = window.plantsDatabase.filter(plant => 
+            plant.category !== 'wishlist' && 
+            !(plant.category && plant.category.split(',').includes('wishlist'))
+        ).length;
+        const wishlistCount = window.plantsDatabase.filter(plant => 
+            plant.category === 'wishlist' || 
+            (plant.category && plant.category.split(',').includes('wishlist'))
+        ).length;
         const currentFiltered = getFilteredPlants().length;
         
         const displayCount = currentCategory === 'all' ? totalPlants : currentFiltered;

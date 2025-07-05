@@ -658,7 +658,7 @@ plants = [
     {
         name: "Cardamom",
         botanical: "Elettaria cardamomum",
-        category: "herbs",
+        category: "herbs,ornamental",
         info_url: "https://plantpono.org/pono-plants/elettaria-cardamomum-cardamom/",
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/9/9c/Cardamom_plant.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/7/72/Cardamone.jpg",
