@@ -1557,18 +1557,15 @@ body::before {
 
 /* Print Styles for Map */
 @media print {
-    /* Hide everything except print container during print */
-    body * {
+    body.printing-map * {
         visibility: hidden;
     }
     
-    /* Show only the print container and its contents */
-    .map-print-container,
-    .map-print-container * {
-        visibility: visible;
+    body.printing-map .map-print-container,
+    body.printing-map .map-print-container * {
+        visibility: visible !important;
     }
     
-    /* Print container styling */
     .map-print-container {
         position: absolute;
         left: 0;
@@ -1576,85 +1573,77 @@ body::before {
         width: 100%;
         height: 100%;
         background: white;
-        color: black;
+        z-index: 9999;
     }
     
-    /* Individual print pages */
     .map-print-page {
         width: 100%;
         height: 100vh;
-        background: white;
+        page-break-after: always;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
         padding: 20px;
         box-sizing: border-box;
+        background: white;
+        overflow: hidden;
     }
     
-    /* Print page content containers */
+    .map-print-page:last-child {
+        page-break-after: avoid;
+    }
+    
+    .print-title {
+        color: #000 !important;
+        font-size: 18px !important;
+        margin: 0 0 20px 0 !important;
+        text-align: center !important;
+        font-weight: bold !important;
+    }
+    
     .map-print-content {
         width: 100%;
-        height: calc(100% - 60px);
+        height: calc(100vh - 80px);
         display: flex;
-        align-items: center;
         justify-content: center;
+        align-items: center;
         overflow: hidden;
-        position: relative;
     }
     
-    /* Map container styling for print */
-    .map-print-content .map-container {
-        background: white;
-        border: 2px solid #333;
-        box-shadow: none;
-        position: relative;
-        width: 80%;
-        height: 80%;
+    .map-print-content > div {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        visibility: visible !important;
     }
     
-    /* Ensure plant markers are visible and clear in print */
-    .plant-marker {
+    /* Ensure map images are visible in print */
+    .map-print-content img {
+        display: block !important;
         visibility: visible !important;
         opacity: 1 !important;
-        font-weight: bold;
+        max-width: none !important;
+        max-height: none !important;
+    }
+    
+    /* Ensure plant markers are visible in print */
+    .map-print-content .plant-marker {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: absolute !important;
+        z-index: 10 !important;
+    }
+    
+    .map-print-content .plant-label {
         color: #000 !important;
-        background: rgba(255, 255, 255, 0.95) !important;
-        border: 2px solid #000 !important;
-        border-radius: 50%;
-        padding: 6px;
-        font-size: 14px;
-        min-width: 30px;
-        min-height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-    
-    /* Hide navigation and other UI elements */
-    .header, .navigation, .footer-bar, .main-content > *:not(.map-print-container) {
-        display: none !important;
-    }
-    
-    /* Page setup for portrait orientation */
-    @page {
-        size: portrait;
-        margin: 0.5in;
-    }
-    
-    /* Page break control */
-    .map-print-page-2 {
-        page-break-before: always;
-    }
-    
-    /* Print-specific headings */
-    .map-print-page h2 {
-        color: #000 !important;
-        font-size: 18px;
-        margin: 0 0 20px 0;
-        text-align: center;
-        font-weight: bold;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        padding: 2px 4px !important;
+        border-radius: 3px !important;
+        font-size: 10px !important;
+        font-weight: bold !important;
+        display: block !important;
+        visibility: visible !important;
     }
 }

@@ -748,53 +748,17 @@ window.MapManager = (function() {
             return;
         }
         
+        const mapContainer = document.getElementById('mapContainer');
+        if (!mapContainer) {
+            console.error('❌ Map container not found');
+            return;
+        }
+        
         // Add a temporary print class to the body for enhanced print styling
         document.body.classList.add('printing-map');
         
-        // Create a temporary print-specific container
-        const printContainer = document.createElement('div');
-        printContainer.className = 'map-print-container';
-        printContainer.innerHTML = `
-            <div class="map-print-page map-print-page-1">
-                <h2 style="text-align: center; margin-bottom: 20px; color: #000;">Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
-                <div class="map-print-content" id="map-print-content-1"></div>
-            </div>
-            <div class="map-print-page map-print-page-2" style="page-break-before: always;">
-                <h2 style="text-align: center; margin-bottom: 20px; color: #000;">Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
-                <div class="map-print-content" id="map-print-content-2"></div>
-            </div>
-        `;
-        
-        // Temporarily add print container to body first
-        document.body.appendChild(printContainer);
-        
-        // Clone the map container for printing
-        const mapContainer = document.getElementById('mapContainer');
-        if (mapContainer) {
-            const mapClone1 = mapContainer.cloneNode(true);
-            const mapClone2 = mapContainer.cloneNode(true);
-            
-            // Add print-specific styling
-            mapClone1.style.transform = 'rotate(90deg) scale(0.8)';
-            mapClone1.style.transformOrigin = 'center center';
-            mapClone1.style.clipPath = 'inset(0 0 50% 0)'; // Show top half
-            
-            mapClone2.style.transform = 'rotate(90deg) scale(0.8)';
-            mapClone2.style.transformOrigin = 'center center';
-            mapClone2.style.clipPath = 'inset(50% 0 0 0)'; // Show bottom half
-            mapClone2.style.marginTop = '-50%'; // Adjust positioning for bottom half
-            
-            // Now we can safely access the elements since printContainer is in the DOM
-            const printContent1 = document.getElementById('map-print-content-1');
-            const printContent2 = document.getElementById('map-print-content-2');
-            
-            if (printContent1 && printContent2) {
-                printContent1.appendChild(mapClone1);
-                printContent2.appendChild(mapClone2);
-            } else {
-                console.error('❌ Could not find print content containers');
-            }
-        }
+        // Create print container with rendered map content
+        createPrintPages(mapContainer);
         
         // Trigger print dialog
         setTimeout(() => {
@@ -802,13 +766,127 @@ window.MapManager = (function() {
             
             // Clean up after printing
             setTimeout(() => {
-                document.body.removeChild(printContainer);
+                const printContainer = document.querySelector('.map-print-container');
+                if (printContainer) {
+                    document.body.removeChild(printContainer);
+                }
                 document.body.classList.remove('printing-map');
                 console.log('✅ Print cleanup completed');
             }, 1000);
         }, 500);
         
         console.log('✅ Print dialog opened');
+    }
+    
+    function createPrintPages(mapContainer) {
+        // Create a temporary print-specific container
+        const printContainer = document.createElement('div');
+        printContainer.className = 'map-print-container';
+        
+        // Clone the map container for each page
+        const mapClone1 = mapContainer.cloneNode(true);
+        const mapClone2 = mapContainer.cloneNode(true);
+        
+        // Remove IDs to avoid conflicts
+        removeIds(mapClone1);
+        removeIds(mapClone2);
+        
+        // Style the clones for printing
+        styleMapForPrint(mapClone1, 1);
+        styleMapForPrint(mapClone2, 2);
+        
+        // Create the print container HTML
+        printContainer.innerHTML = `
+            <div class="map-print-page map-print-page-1">
+                <h2 class="print-title">Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
+                <div class="map-print-content" id="map-print-content-1"></div>
+            </div>
+            <div class="map-print-page map-print-page-2">
+                <h2 class="print-title">Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
+                <div class="map-print-content" id="map-print-content-2"></div>
+            </div>
+        `;
+        
+        // Add to body first
+        document.body.appendChild(printContainer);
+        
+        // Add the map clones to the print content
+        const printContent1 = document.getElementById('map-print-content-1');
+        const printContent2 = document.getElementById('map-print-content-2');
+        
+        if (printContent1 && printContent2) {
+            printContent1.appendChild(mapClone1);
+            printContent2.appendChild(mapClone2);
+        }
+    }
+    
+    function removeIds(element) {
+        // Remove ID attributes to avoid conflicts
+        if (element.id) {
+            element.removeAttribute('id');
+        }
+        
+        // Recursively remove IDs from children
+        const children = element.children;
+        for (let i = 0; i < children.length; i++) {
+            removeIds(children[i]);
+        }
+    }
+    
+    function styleMapForPrint(mapClone, pageNumber) {
+        // Reset any transforms and make visible
+        mapClone.style.transform = 'none';
+        mapClone.style.position = 'relative';
+        mapClone.style.width = '100%';
+        mapClone.style.height = 'auto';
+        mapClone.style.maxWidth = 'none';
+        mapClone.style.maxHeight = 'none';
+        mapClone.style.overflow = 'visible';
+        mapClone.style.background = 'white';
+        
+        // Apply page-specific clipping
+        if (pageNumber === 1) {
+            // Show top half
+            mapClone.style.clipPath = 'inset(0 0 50% 0)';
+            mapClone.style.marginBottom = '-50%';
+        } else {
+            // Show bottom half
+            mapClone.style.clipPath = 'inset(50% 0 0 0)';
+            mapClone.style.marginTop = '-50%';
+        }
+        
+        // Rotate the map 90 degrees for landscape orientation in portrait page
+        mapClone.style.transform = 'rotate(90deg) scale(0.7)';
+        mapClone.style.transformOrigin = 'center center';
+        
+        // Ensure all plant markers are visible
+        const plantMarkers = mapClone.querySelectorAll('.plant-marker');
+        plantMarkers.forEach(marker => {
+            marker.style.display = 'block';
+            marker.style.visibility = 'visible';
+            marker.style.opacity = '1';
+            marker.style.position = 'absolute';
+            marker.style.zIndex = '10';
+            
+            // Make sure text is readable
+            const label = marker.querySelector('.plant-label');
+            if (label) {
+                label.style.color = '#000';
+                label.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                label.style.padding = '2px 4px';
+                label.style.borderRadius = '3px';
+                label.style.fontSize = '12px';
+                label.style.fontWeight = 'bold';
+            }
+        });
+        
+        // Ensure map background image is visible
+        const mapImg = mapClone.querySelector('img');
+        if (mapImg) {
+            mapImg.style.display = 'block';
+            mapImg.style.width = '100%';
+            mapImg.style.height = 'auto';
+        }
     }
 
     // Public API
