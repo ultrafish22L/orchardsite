@@ -395,6 +395,8 @@ plants = [
         botanical: "Platonia insignis",
         category: "fruit",
         info_url: "https://en.wikipedia.org/wiki/Platonia_insignis",
+        plant_photo: "https://upload.wikimedia.org/wikipedia/commons/b/b2/Bacurizal.jpg",
+        fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Bacuri_fruit_and_the_butter_from_the_seeds.JPG",
         emoji: "🟡",
         rare: true,
         general_info: "Bacuri (*Platonia insignis*) is a dry-season deciduous tree native to South America's humid forests, especially the Amazon Rainforest of Brazil, Paraguay, Colombia, and Guyana. **Mature Size**: Reaches 82-131 feet (25-40 meters) tall with pyramidal crown and trunk diameter of 2-4 feet. **Growth Habit**: Opposite, simple oblong leaves 8-15cm long, glossy dark green with wavy margins. Copious yellow latex in bark. **Fruit**: Round to oval fruits 7-14cm long with thick yellow skin resembling papaya. Sticky white pulp is fragrant with sweet-sour taste. **Production**: Contains 3-5 seeds. High in phosphorus, iron, and vitamin C. **Pollination**: Ornithophilous - pollinated by white-bellied parrots. **Uses**: Fruit made into condiments and beverages; seeds yield oil for skin conditions; yellowish wood used as timber.",
@@ -421,6 +423,7 @@ plants = [
         category: "fruit",
         info_url: "https://edis.ifas.ufl.edu/publication/HS1462",
         plant_photo: "https://www.hawaiiantropicalplants.com/PHOTOS/Garcinia_humilis.jpg",
+        flower_photo: "https://upload.wikimedia.org/wikipedia/commons/8/85/Garcinia_sessilis%2C_flower.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/5/51/Achacha_seed.jpg",
         emoji: "🟠",
         rare: true,
@@ -1323,5 +1326,18 @@ plants = [
         cultivation_tips: "Requires tropical climate with high humidity. Deep, fertile, well-drained soil. Full sun preferred. Slow growing initially. Takes many years to reach flowering maturity.",
         pest_management: "Generally pest-resistant once established. Monitor for general tropical tree pests.",
         pruning_guidelines: "Minimal pruning required. Remove dead wood as needed. Avoid heavy pruning as tree is slow to recover."
+    },
+    {
+        name: "Araza",
+        botanical: "Eugenia stipitata",
+        category: "fruit",
+        info_url: "https://en.wikipedia.org/wiki/Eugenia_stipitata",
+        plant_photo: "https://upload.wikimedia.org/wikipedia/commons/3/37/Eugenia_stipitata_in_Jardin_des_Plantes_de_Toulouse_02.jpg",
+        emoji: "🟡",
+        rare: true,
+        general_info: "Araza (*Eugenia stipitata*) is a fruit tree native to the Amazon Rainforest in Brazil, Colombia, Peru and Ecuador. **Mature Size**: Shrub or small tree growing 2.5-15 meters tall with densely branched canopy. **Growth Habit**: Simple, opposite, elliptical leaves 8-19 by 3.5-9.5 cm with dark green color and impressed lateral veins. **Fruit**: Globose to oblate berry, 2-10 x 2-12 cm, weighing up to 750g. Pale green ripening to bright yellow with thin, velvety skin. **Flavor**: Juicy, aromatic, acidic thick pulp with sweet-sour taste. **Production**: Contains usually 12 seeds. High in phosphorus, iron, and vitamin C. **Uses**: Processed into juices, nectars, marmalades, ice-creams due to very acidic nature when fresh.",
+        cultivation_tips: "**Climate**: Requires humid tropical climate similar to Amazon conditions. **Soil**: Grows on old, non-floodable terraces in tropical, white, highly leached podzolic soils with good drainage. **Light**: Tolerates partial shade but produces better in more light. **Hawaii-specific**: Well-suited to Hawaii's humid climate, especially at higher elevations with consistent moisture. **Water**: Consistent moisture essential but avoid waterlogging. **Spacing**: 15-20 feet apart due to compact size. **Production**: Trees begin fruiting relatively quickly after establishment. **Challenge**: Very acidic fruit requires processing for palatability.",
+        pest_management: "**General**: Monitor for typical tropical fruit tree pests like scale insects and fruit flies. **Fungal issues**: Ensure good air circulation in humid conditions. **Hawaii-specific**: Watch for introduced pests common to Myrtaceae family plants. **Environmental**: Protect from strong winds and salt spray. **Preventive**: Maintain good drainage while keeping soil consistently moist.",
+        pruning_guidelines: "**Timing**: Prune during dry periods to reduce disease risk. **Training**: Shape young trees to develop strong branched framework. **Maintenance**: Remove dead, diseased, or crossing branches. **Size management**: Light pruning to maintain manageable height for fruit harvesting. **Air circulation**: Prune to improve airflow in humid conditions. **Structural**: Focus on developing strong scaffold branches for fruit production."
     }
 ];
