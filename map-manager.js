@@ -765,6 +765,9 @@ window.MapManager = (function() {
             </div>
         `;
         
+        // Temporarily add print container to body first
+        document.body.appendChild(printContainer);
+        
         // Clone the map container for printing
         const mapContainer = document.getElementById('mapContainer');
         if (mapContainer) {
@@ -781,12 +784,17 @@ window.MapManager = (function() {
             mapClone2.style.clipPath = 'inset(50% 0 0 0)'; // Show bottom half
             mapClone2.style.marginTop = '-50%'; // Adjust positioning for bottom half
             
-            document.getElementById('map-print-content-1').appendChild(mapClone1);
-            document.getElementById('map-print-content-2').appendChild(mapClone2);
+            // Now we can safely access the elements since printContainer is in the DOM
+            const printContent1 = document.getElementById('map-print-content-1');
+            const printContent2 = document.getElementById('map-print-content-2');
+            
+            if (printContent1 && printContent2) {
+                printContent1.appendChild(mapClone1);
+                printContent2.appendChild(mapClone2);
+            } else {
+                console.error('❌ Could not find print content containers');
+            }
         }
-        
-        // Temporarily add print container to body
-        document.body.appendChild(printContainer);
         
         // Trigger print dialog
         setTimeout(() => {
