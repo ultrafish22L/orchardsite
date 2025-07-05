@@ -788,9 +788,11 @@ window.MapManager = (function() {
                         display: flex;
                         flex-direction: column;
                         align-items: center;
-                        justify-content: flex-start;
+                        justify-content: center;
                         background: white;
                         overflow: hidden;
+                        box-sizing: border-box;
+                        padding: 20px;
                     }
                     
                     .print-page:last-child {
@@ -803,33 +805,37 @@ window.MapManager = (function() {
                         margin: 0 0 20px 0;
                         text-align: center;
                         font-weight: bold;
+                        position: absolute;
+                        top: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
                     }
                     
                     .map-content {
                         width: 100%;
-                        height: calc(100vh - 80px);
+                        height: 100%;
                         display: flex;
                         justify-content: center;
                         align-items: center;
                         overflow: hidden;
                         background: white;
-                        border: 1px solid #ccc;
                         position: relative;
                     }
                     
                     .map-image {
-                        width: 100%;
-                        height: auto;
-                        transform: rotate(90deg) scale(0.7);
+                        width: auto;
+                        height: 200vh;
+                        transform: rotate(90deg);
                         transform-origin: center center;
+                        position: relative;
                     }
                     
                     .map-content.page-1 .map-image {
-                        clip-path: inset(0 0 50% 0);
+                        top: 50vh;
                     }
                     
                     .map-content.page-2 .map-image {
-                        clip-path: inset(50% 0 0 0);
+                        top: -50vh;
                     }
                 </style>
             </head>
