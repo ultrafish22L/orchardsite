@@ -15,7 +15,10 @@ window.PlantManager = (function() {
         
         let plantsData = null;
         
-        if (typeof plants !== 'undefined') {
+        if (typeof window.plantsDatabase !== 'undefined') {
+            console.log('📊 Found plantsDatabase on window object');
+            plantsData = window.plantsDatabase;
+        } else if (typeof plants !== 'undefined') {
             console.log('📊 Found plants in global scope');
             plantsData = plants;
         } else if (typeof window.plants !== 'undefined') {
@@ -34,6 +37,12 @@ window.PlantManager = (function() {
             hideMessage('errorMessage');
             renderPlants();
             updateFooterStats();
+            
+            // Update map dropdown if MapManager is available
+            if (window.MapManager && typeof window.MapManager.populatePlantDropdown === 'function') {
+                window.MapManager.populatePlantDropdown();
+                console.log('🗺️ Map dropdown updated with plant database');
+            }
         } else {
             console.log('❌ Plant database not found, empty, or invalid');
             plantsLoaded = false;
