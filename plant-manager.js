@@ -8,7 +8,6 @@ window.PlantManager = (function() {
     let currentCategory = 'all';
     let searchTerm = '';
     let plantsLoaded = false;
-    let plantNotes = {};
 
     // Check for plant database and initialize
     function checkPlantDatabase() {
@@ -205,13 +204,7 @@ window.PlantManager = (function() {
             textContent += `<h3>Pruning Guidelines</h3><p>${plant.pruning_guidelines}</p>`;
         }
         
-        textContent += `
-            <div class="notes-section">
-                <h3>My Notes</h3>
-                <textarea class="notes-textarea" placeholder="Add your personal notes about this plant..." 
-                          onchange="PlantManager.saveNote('${plant.name}', this.value)">${getNote(plant.name)}</textarea>
-            </div>
-        `;
+
         
         text.innerHTML = textContent;
         
@@ -229,13 +222,7 @@ window.PlantManager = (function() {
         document.getElementById('detailOverlay').style.display = 'none';
     }
 
-    function saveNote(plantName, note) {
-        plantNotes[plantName] = note;
-    }
-    
-    function getNote(plantName) {
-        return plantNotes[plantName] || '';
-    }
+
 
     function openPhotoModal(imageSrc) {
         const modal = document.getElementById('photoModal');
@@ -312,10 +299,6 @@ window.PlantManager = (function() {
         closeDetail: closeDetail,
         openPhotoModal: openPhotoModal,
         closePhotoModal: closePhotoModal,
-        
-        // Notes functions
-        saveNote: saveNote,
-        getNote: getNote,
         
         // Search functions
         handleSearch: handleSearch,

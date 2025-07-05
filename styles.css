@@ -1066,27 +1066,7 @@ body::before {
     color: rgba(255, 255, 255, 0.9);
 }
 
-.notes-section {
-    margin-top: auto;
-    padding-top: 1rem;
-}
 
-.notes-textarea {
-    width: 100%;
-    min-height: 100px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid #40e0d0;
-    border-radius: 10px;
-    padding: 1rem;
-    color: white;
-    font-family: inherit;
-    resize: vertical;
-    outline: none;
-}
-
-.notes-textarea::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-}
 
 .detail-controls {
     display: flex;
