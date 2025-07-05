@@ -1156,7 +1156,6 @@ window.MapManager = (function() {
         
         // Plant management
         startAddPlant: startAddPlant,
-        deletePlant: deletePlant,
         selectPlant: selectPlant,
         deselectPlant: deselectPlant,
         

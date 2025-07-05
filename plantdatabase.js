@@ -1,4 +1,4 @@
-plants = [
+window.plantsDatabase = [
     // BANANAS
     {
         name: "Apple Banana",

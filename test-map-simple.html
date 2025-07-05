@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Map Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+        }
+        
+        .controls button, .controls select {
+            margin: 5px;
+            padding: 8px 16px;
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .controls button:hover {
+            background: #444;
+        }
+        
+        #mapContainer {
+            width: 600px;
+            height: 400px;
+            border: 2px solid #333;
+            position: relative;
+            background: #0f4c3a;
+            margin: 20px 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            background: #2a2a2a;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .map-plant {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .map-plant-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(127, 255, 212, 0.3);
+            border: 2px solid #7fffd4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        
+        .map-plant.selected .map-plant-circle {
+            border-color: #ffff44;
+            box-shadow: 0 0 20px rgba(255, 255, 68, 0.8);
+        }
+        
+        .map-plant.temp .map-plant-circle {
+            border-color: #ffff44;
+            background: rgba(255, 255, 68, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <h1>🗺️ Simple Map Test</h1>
+    
+    <div class="status" id="status">Loading...</div>
+    
+    <div class="controls">
+        <select id="map-plant-select">
+            <option value="">Select plant to add...</option>
+        </select>
+        <button id="map-add-btn">+ Add</button>
+        <button id="map-edit-btn">✏️ Edit</button>
+        <button id="map-delete-btn">🗑️ Delete</button>
+        <button id="map-print-btn">🖨️ Print</button>
+        
+        <div id="map-edit-controls" class="hidden">
+            <button id="map-confirm-btn">✓ Confirm</button>
+            <button id="map-cancel-btn">✗ Cancel</button>
+        </div>
+    </div>
+    
+    <div id="mapContainer">
+        <img src="giantslothorchard_map.png" alt="Farm Map" style="width: 100%; height: 100%; object-fit: cover;">
+    </div>
+    
+    <div class="status">
+        <strong>Instructions:</strong><br>
+        1. Plant should be pre-selected (Apple Banana)<br>
+        2. Click "Add" button<br>
+        3. Click on map to place plant<br>
+        4. Click "Confirm" to save or "Cancel" to abort<br>
+        5. Try "Edit" and "Delete" modes
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="plantdatabase.js"></script>
+    <script src="map-manager.js"></script>
+    
+    <script>
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML = message;
+            console.log(message);
+        }
+        
+        function runTest() {
+            updateStatus('🔄 Starting test...');
+            
+            // Check if dependencies loaded
+            if (!window.plantsDatabase) {
+                updateStatus('❌ Plant database not loaded');
+                return;
+            }
+            
+            if (!window.MapManager) {
+                updateStatus('❌ Map Manager not loaded');
+                return;
+            }
+            
+            updateStatus(`✅ Loaded ${window.plantsDatabase.length} plants and Map Manager`);
+            
+            // Initialize map
+            try {
+                window.MapManager.initializeMap();
+                updateStatus('✅ Map initialized successfully');
+            } catch (error) {
+                updateStatus(`❌ Map initialization failed: ${error.message}`);
+                return;
+            }
+            
+            // Setup event listeners
+            try {
+                window.MapManager.setupMapEventListeners();
+                updateStatus('✅ Event listeners setup successfully');
+            } catch (error) {
+                updateStatus(`❌ Event listeners setup failed: ${error.message}`);
+                return;
+            }
+            
+            // Check dropdown
+            const dropdown = document.getElementById('map-plant-select');
+            if (dropdown && dropdown.value === 'Apple Banana') {
+                updateStatus('✅ Dropdown defaulted to Apple Banana - Ready to test!');
+            } else {
+                updateStatus(`⚠️ Dropdown value: ${dropdown?.value || 'undefined'}`);
+            }
+        }
+        
+        // Run test when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runTest, 100);
+        });
+    </script>
+</body>
+</html>
