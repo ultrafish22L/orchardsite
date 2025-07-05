@@ -754,28 +754,116 @@ window.MapManager = (function() {
             return;
         }
         
-        // Add a temporary print class to the body for enhanced print styling
-        document.body.classList.add('printing-map');
+        // Get the map image source
+        const mapImg = mapContainer.querySelector('img');
+        const mapSrc = mapImg ? mapImg.src : 'giantslothorchard_map.png';
         
-        // Create print container with rendered map content
-        createPrintPages(mapContainer);
+        // Create a simple print window
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
         
-        // Trigger print dialog
-        setTimeout(() => {
-            window.print();
-            
-            // Clean up after printing
+        // Create the print document content
+        const printHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Giant Sloth Orchard - Farm Map</title>
+                <style>
+                    @page {
+                        size: portrait;
+                        margin: 0.5in;
+                    }
+                    
+                    body {
+                        margin: 0;
+                        padding: 20px;
+                        font-family: Arial, sans-serif;
+                        background: white;
+                        color: black;
+                    }
+                    
+                    .print-page {
+                        width: 100%;
+                        height: 100vh;
+                        page-break-after: always;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: flex-start;
+                        background: white;
+                        overflow: hidden;
+                    }
+                    
+                    .print-page:last-child {
+                        page-break-after: avoid;
+                    }
+                    
+                    .print-title {
+                        color: #000;
+                        font-size: 18px;
+                        margin: 0 0 20px 0;
+                        text-align: center;
+                        font-weight: bold;
+                    }
+                    
+                    .map-content {
+                        width: 100%;
+                        height: calc(100vh - 80px);
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        overflow: hidden;
+                        background: white;
+                        border: 1px solid #ccc;
+                        position: relative;
+                    }
+                    
+                    .map-image {
+                        width: 100%;
+                        height: auto;
+                        transform: rotate(90deg) scale(0.7);
+                        transform-origin: center center;
+                    }
+                    
+                    .map-content.page-1 .map-image {
+                        clip-path: inset(0 0 50% 0);
+                    }
+                    
+                    .map-content.page-2 .map-image {
+                        clip-path: inset(50% 0 0 0);
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="print-page">
+                    <h2 class="print-title">Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
+                    <div class="map-content page-1">
+                        <img class="map-image" src="${mapSrc}" alt="Farm Map">
+                    </div>
+                </div>
+                
+                <div class="print-page">
+                    <h2 class="print-title">Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
+                    <div class="map-content page-2">
+                        <img class="map-image" src="${mapSrc}" alt="Farm Map">
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        // Write content to print window
+        printWindow.document.write(printHTML);
+        printWindow.document.close();
+        
+        // Wait for content to load, then print
+        printWindow.onload = function() {
             setTimeout(() => {
-                const printContainer = document.querySelector('.map-print-container');
-                if (printContainer) {
-                    document.body.removeChild(printContainer);
-                }
-                document.body.classList.remove('printing-map');
-                console.log('✅ Print cleanup completed');
-            }, 1000);
-        }, 500);
+                printWindow.print();
+                printWindow.close();
+            }, 500);
+        };
         
-        console.log('✅ Print dialog opened');
+        console.log('✅ Print window opened with map content');
     }
     
     function createPrintPages(mapContainer) {
