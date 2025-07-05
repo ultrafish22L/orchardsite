@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Mode Test - Giant Sloth Orchard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .map-container {
+            width: 400px;
+            height: 300px;
+            border: 2px solid #333;
+            position: relative;
+            background: #e8f5e8;
+            margin: 20px 0;
+            cursor: default;
+        }
+        .plant-element {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+            cursor: pointer;
+            user-select: none;
+        }
+        .controls {
+            margin: 10px 0;
+        }
+        .btn {
+            padding: 8px 16px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn:hover { opacity: 0.8; }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🗺️ Edit Mode Test</h1>
+        <p>This page tests the improved edit mode functionality:</p>
+        <ul>
+            <li><strong>Immediate Drag:</strong> Click any plant in edit mode to start dragging immediately</li>
+            <li><strong>Position Restore:</strong> Cancel button restores plants to original positions</li>
+        </ul>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="startEditMode()">✏️ Start Edit Mode</button>
+            <button class="btn btn-success" onclick="confirmEdit()" id="confirmBtn" style="display:none;">✓ Confirm</button>
+            <button class="btn btn-danger" onclick="cancelEdit()" id="cancelBtn" style="display:none;">✕ Cancel</button>
+            <button class="btn" onclick="addTestPlant()">+ Add Test Plant</button>
+            <button class="btn" onclick="clearLog()">Clear Log</button>
+        </div>
+
+        <div class="status" id="status">
+            Mode: Normal | Plants: <span id="plantCount">0</span>
+        </div>
+
+        <div id="mapContainer" class="map-container"></div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <!-- Mock plant database -->
+    <script>
+        window.plantsDatabase = [
+            { name: 'Apple Banana', botanical: 'Musa acuminata', category: 'bananas', emoji: '🍌' },
+            { name: 'Cacao', botanical: 'Theobroma cacao', category: 'theobroma', emoji: '🍫' },
+            { name: 'Avocado', botanical: 'Persea americana', category: 'fruit', emoji: '🥑' }
+        ];
+    </script>
+
+    <!-- Load map manager -->
+    <script src="map-manager.js"></script>
+
+    <script>
+        let testPlantCounter = 0;
+        
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateStatus() {
+            const status = document.getElementById('status');
+            const plantCount = document.getElementById('plantCount');
+            
+            // We can't directly access internal state, so we'll count DOM elements
+            const plants = document.querySelectorAll('.plant-element');
+            plantCount.textContent = plants.length;
+            
+            // Update mode display based on button visibility
+            const editMode = document.getElementById('confirmBtn').style.display !== 'none';
+            status.innerHTML = `Mode: ${editMode ? 'Edit' : 'Normal'} | Plants: <span id="plantCount">${plants.length}</span>`;
+        }
+
+        function startEditMode() {
+            try {
+                window.MapManager.startEditMode();
+                document.getElementById('confirmBtn').style.display = 'inline-block';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+                updateStatus();
+                log('✏️ Edit mode started - click and drag plants to move them');
+            } catch (error) {
+                log('❌ Error starting edit mode: ' + error.message);
+            }
+        }
+
+        function confirmEdit() {
+            try {
+                window.MapManager.confirmEditMode();
+                document.getElementById('confirmBtn').style.display = 'none';
+                document.getElementById('cancelBtn').style.display = 'none';
+                updateStatus();
+                log('✅ Edit mode confirmed - changes saved');
+            } catch (error) {
+                log('❌ Error confirming edit: ' + error.message);
+            }
+        }
+
+        function cancelEdit() {
+            try {
+                window.MapManager.cancelEditMode();
+                document.getElementById('confirmBtn').style.display = 'none';
+                document.getElementById('cancelBtn').style.display = 'none';
+                updateStatus();
+                log('❌ Edit mode canceled - positions restored');
+            } catch (error) {
+                log('❌ Error canceling edit: ' + error.message);
+            }
+        }
+
+        function addTestPlant() {
+            testPlantCounter++;
+            const plants = window.plantsDatabase;
+            const randomPlant = plants[Math.floor(Math.random() * plants.length)];
+            
+            // Create a test plant element manually (since we can't access internal state)
+            const mapContainer = document.getElementById('mapContainer');
+            const plantElement = document.createElement('div');
+            plantElement.className = 'plant-element';
+            plantElement.style.left = (50 + testPlantCounter * 60) + 'px';
+            plantElement.style.top = (50 + (testPlantCounter % 3) * 60) + 'px';
+            plantElement.style.width = '40px';
+            plantElement.style.height = '40px';
+            plantElement.style.background = '#4CAF50';
+            plantElement.textContent = randomPlant.emoji;
+            plantElement.title = randomPlant.name;
+            
+            mapContainer.appendChild(plantElement);
+            updateStatus();
+            log(`🌱 Added test plant: ${randomPlant.name} at position (${plantElement.style.left}, ${plantElement.style.top})`);
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                window.MapManager.initializeMap();
+                log('🗺️ Map manager initialized');
+                updateStatus();
+                
+                // Add some initial test plants
+                addTestPlant();
+                addTestPlant();
+                addTestPlant();
+                
+            } catch (error) {
+                log('❌ Error initializing map: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

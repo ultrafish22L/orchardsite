@@ -11,6 +11,7 @@ window.MapManager = (function() {
     let selectedPlantForAddition = '';
     let tempPlantData = null; // Holds the temp plant data without adding to placedPlants
     let tempDeleteList = {}; // Holds plants marked for deletion
+    let originalPositions = {}; // Backup of plant positions before editing
     let mapInitialized = false;
     let isDragging = false;
 
@@ -205,20 +206,17 @@ window.MapManager = (function() {
                 }
             }
         } else if (mapMode === 'edit') {
-            // In edit mode, start dragging if clicking on a selected plant
-            if (selectedPlant && placedPlants[selectedPlant]) {
-                const rect = event.currentTarget.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-                
-                const plant = placedPlants[selectedPlant];
-                const distance = Math.sqrt(
-                    Math.pow(x - plant.x, 2) + Math.pow(y - plant.y, 2)
-                );
-                if (distance <= plant.radius) {
-                    isDragging = true;
-                    event.preventDefault();
-                }
+            // In edit mode, find any plant at click position and start dragging immediately
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const clickedPlant = findPlantAtPosition(x, y);
+            if (clickedPlant && clickedPlant.id !== 'temp') {
+                selectedPlant = clickedPlant.id;
+                isDragging = true;
+                event.preventDefault();
+                console.log('🖱️ Started dragging plant:', placedPlants[selectedPlant].name);
             }
         }
         // In normal mode, don't allow dragging - only clicking for details
@@ -374,7 +372,16 @@ window.MapManager = (function() {
         tempPlantData = null; // Reset temp plant data
         isDragging = false; // Reset dragging state
         
-        console.log('✅ Entering edit mode');
+        // Backup original positions for cancel functionality
+        originalPositions = {};
+        Object.keys(placedPlants).forEach(plantId => {
+            originalPositions[plantId] = {
+                x: placedPlants[plantId].x,
+                y: placedPlants[plantId].y
+            };
+        });
+        
+        console.log('✅ Entering edit mode - backed up', Object.keys(originalPositions).length, 'plant positions');
         
         // Hide all buttons except check and X
         hideAllButtonsExceptConfirmCancel();
@@ -395,6 +402,17 @@ window.MapManager = (function() {
         tempPlantData = null;
         isDragging = false;
 
+        // Restore original positions
+        Object.keys(originalPositions).forEach(plantId => {
+            if (placedPlants[plantId]) {
+                placedPlants[plantId].x = originalPositions[plantId].x;
+                placedPlants[plantId].y = originalPositions[plantId].y;
+            }
+        });
+        
+        console.log('🔄 Restored', Object.keys(originalPositions).length, 'plants to original positions');
+        originalPositions = {}; // Clear backup
+
         // Show all buttons, hide confirm/cancel
         showAllButtons();
 
@@ -404,7 +422,7 @@ window.MapManager = (function() {
             mapContainer.style.cursor = 'default';
         }
 
-        // Re-render to restore original positions
+        // Re-render to show restored positions
         renderMapPlants();
         console.log('✅ Edit mode canceled');
     }
@@ -415,6 +433,9 @@ window.MapManager = (function() {
         selectedPlant = null;
         tempPlantData = null;
         isDragging = false;
+        
+        // Clear backup positions since changes are confirmed
+        originalPositions = {};
 
         // Show all buttons, hide confirm/cancel
         showAllButtons();
