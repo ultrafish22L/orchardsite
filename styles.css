@@ -1579,9 +1579,9 @@ body::after {
         padding: 0;
         page-break-after: always;
         width: 100%;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
+        height: 100%;
+        display: block;
+        position: relative;
     }
     
     .print-page:last-child {
@@ -1593,11 +1593,12 @@ body::after {
     }
     
     .map-content {
-        flex: 1;
+        position: absolute;
+        top: 0;
+        left: 0;
         background: none;
         border: none;
         border-radius: 0;
-        position: relative;
         overflow: hidden;
         margin: 0;
         width: 100%;
@@ -1612,7 +1613,8 @@ body::after {
         height: 100%;
         opacity: 1;
         z-index: 1;
-        object-fit: cover;
+        object-fit: contain;
+        object-position: top left;
         -webkit-print-color-adjust: exact !important;
         color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -1666,13 +1668,12 @@ body::after {
     }
     
     .print-page.map-page {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: stretch;
+        display: block;
+        position: relative;
         background: white;
         width: 100%;
         height: 100%;
+        overflow: hidden;
     }
 }
 
