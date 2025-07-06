@@ -919,21 +919,38 @@ window.MapManager = (function() {
             return;
         }
         
-        // Get the map image source - ensure it's a full URL
-        const mapImg = mapContainer.querySelector('img');
-        let mapSrc = mapImg ? mapImg.src : 'giantslothorchard_map.png';
+        // Get all the current plants on the map
+        const mapPlants = mapContainer.querySelectorAll('.map-plant');
+        console.log('🌱 Found', mapPlants.length, 'plants on map');
         
-        // Ensure we have a full URL for the image
-        if (!mapSrc.startsWith('http')) {
-            mapSrc = window.location.origin + '/' + mapSrc.replace(/^\//, '');
+        // Create plant data for print
+        let plantsHTML = '';
+        mapPlants.forEach((plant, index) => {
+            const rect = plant.getBoundingClientRect();
+            const containerRect = mapContainer.getBoundingClientRect();
+            
+            // Calculate relative position within the map
+            const relativeX = ((rect.left - containerRect.left) / containerRect.width) * 100;
+            const relativeY = ((rect.top - containerRect.top) / containerRect.height) * 100;
+            
+            const emoji = plant.querySelector('.map-plant-emoji')?.textContent || '🌿';
+            const plantName = plant.dataset.plantId || `Plant ${index + 1}`;
+            
+            plantsHTML += `
+                <div class="print-plant" style="left: ${relativeX}%; top: ${relativeY}%;" title="${plantName}">
+                    <div class="print-plant-emoji">${emoji}</div>
+                </div>
+            `;
+        });
+        
+        // Create print window
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+        if (!printWindow) {
+            alert('Could not open print window. Please allow popups.');
+            return;
         }
         
-        console.log('🖼️ Using map image:', mapSrc);
-        
-        // Create a simple print window
-        const printWindow = window.open('', '_blank', 'width=800,height=600');
-        
-        // Create the print document content
+        // Create the print document content with actual map background and positioned plants
         const printHTML = `
             <!DOCTYPE html>
             <html>
@@ -970,7 +987,7 @@ window.MapManager = (function() {
                     }
                     
                     .print-title {
-                        color: #000;
+                        color: #2d8f64;
                         font-size: 18px;
                         margin: 0 0 20px 0;
                         text-align: center;
@@ -979,37 +996,161 @@ window.MapManager = (function() {
                     
                     .map-content {
                         flex: 1;
-                        background: white;
-                        border: 1px solid #ccc;
+                        background: linear-gradient(45deg, #4a7c59 0%, #6b8e23 50%, #228b22 100%);
+                        border: 2px solid #2d8f64;
+                        border-radius: 10px;
                         position: relative;
                         display: flex;
                         justify-content: center;
                         align-items: center;
+                        overflow: hidden;
                     }
                     
-                    .map-image {
+                    .map-background {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
                         width: 100%;
-                        height: auto;
+                        height: 100%;
+                        background-image: url('giantslothorchard_map.png');
+                        background-size: cover;
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        opacity: 0.8;
+                    }
+                    
+                    .map-overlay {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        background: rgba(74, 124, 89, 0.3);
+                    }
+                    
+                    .print-plant {
+                        position: absolute;
+                        width: 20px;
+                        height: 20px;
+                        z-index: 10;
+                    }
+                    
+                    .print-plant-emoji {
+                        font-size: 16px;
+                        text-align: center;
+                        line-height: 20px;
+                        background: rgba(255, 255, 255, 0.9);
+                        border-radius: 50%;
+                        border: 2px solid rgba(255, 255, 255, 0.8);
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+                    }
+                    
+                    .map-title {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        color: white;
+                        font-size: 24px;
+                        font-weight: bold;
+                        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+                        text-align: center;
+                        z-index: 5;
+                    }
+                    
+                    .map-subtitle {
+                        position: absolute;
+                        bottom: 20px;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        color: rgba(255, 255, 255, 0.9);
+                        font-size: 14px;
+                        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+                        z-index: 5;
+                    }
+                    
+                    .page-1 .map-content {
                         transform: rotate(90deg);
-                        max-width: none;
-                        max-height: none;
+                        transform-origin: center;
+                        width: 80%;
+                        height: 60%;
+                    }
+                    
+                    .page-2 .map-content {
+                        transform: rotate(90deg);
+                        transform-origin: center;
+                        width: 80%;
+                        height: 60%;
+                    }
+                    
+                    .plant-list {
+                        margin-top: 20px;
+                        padding: 10px;
+                        background: #f5f5f5;
+                        border-radius: 5px;
+                    }
+                    
+                    .plant-list h3 {
+                        margin: 0 0 10px 0;
+                        color: #2d8f64;
+                    }
+                    
+                    .plant-item {
+                        margin: 5px 0;
+                        font-size: 14px;
                     }
                 </style>
             </head>
             <body>
                 <div class="print-page">
-                    <h2 class="print-title">Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
+                    <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
                     <div class="map-content page-1">
-                        <img class="map-image" src="${mapSrc}" alt="Farm Map" onload="console.log('Map image loaded successfully')" onerror="console.error('Failed to load map image:', this.src)">
+                        <div class="map-background"></div>
+                        <div class="map-overlay"></div>
+                        ${plantsHTML}
+                        <div class="map-title">Giant Sloth Orchard<br><small>Holualoa, Hawaii Island</small></div>
+                        <div class="map-subtitle">Exotic Tropical Plants & Rare Fruits</div>
+                    </div>
+                    <div class="plant-list">
+                        <h3>Current Plants on Farm</h3>
+                        ${mapPlants.length > 0 ? 
+                            Array.from(mapPlants).map((plant, i) => {
+                                const emoji = plant.querySelector('.map-plant-emoji')?.textContent || '🌿';
+                                const plantId = plant.dataset.plantId || `Plant ${i + 1}`;
+                                return `<div class="plant-item">${emoji} ${plantId}</div>`;
+                            }).join('') 
+                            : '<div class="plant-item">No plants currently placed on map</div>'
+                        }
                     </div>
                 </div>
                 
                 <div class="print-page">
-                    <h2 class="print-title">Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
+                    <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
                     <div class="map-content page-2">
-                        <img class="map-image" src="${mapSrc}" alt="Farm Map" onload="console.log('Map image loaded successfully')" onerror="console.error('Failed to load map image:', this.src)">
+                        <div class="map-background"></div>
+                        <div class="map-overlay"></div>
+                        ${plantsHTML}
+                        <div class="map-title">Giant Sloth Orchard<br><small>Holualoa, Hawaii Island</small></div>
+                        <div class="map-subtitle">Visits by appointment only</div>
+                    </div>
+                    <div class="plant-list">
+                        <h3>Contact Information</h3>
+                        <div class="plant-item">📍 Location: Holualoa, Hawaii Island</div>
+                        <div class="plant-item">📞 Visits: By appointment only</div>
+                        <div class="plant-item">🌺 Specializing in exotic tropical plants and rare fruits</div>
+                        <div class="plant-item">🦥 Giant sloths love cacao - supporting forest balance</div>
                     </div>
                 </div>
+                
+                <script>
+                    console.log('🖨️ Map print window loaded with ${mapPlants.length} plants');
+                    
+                    // Wait for any background images to load, then print
+                    setTimeout(() => {
+                        console.log('🖨️ Opening print dialog...');
+                        window.print();
+                    }, 1500);
+                </script>
             </body>
             </html>
         `;
@@ -1018,15 +1159,7 @@ window.MapManager = (function() {
         printWindow.document.write(printHTML);
         printWindow.document.close();
         
-        // Wait for content to load, then print
-        printWindow.onload = function() {
-            setTimeout(() => {
-                printWindow.print();
-                printWindow.close();
-            }, 500);
-        };
-        
-        console.log('✅ Print window opened with map content');
+        console.log('✅ Print window opened with map content and', mapPlants.length, 'plants');
     }
     
     function createPrintPages(mapContainer) {
