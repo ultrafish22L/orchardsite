@@ -745,6 +745,8 @@ window.plantsDatabase = [
         category: "herbs",
         emoji: "🥜",
         rare: true,
+        plant_photo: "https://upload.wikimedia.org/wikipedia/commons/3/37/Myristica_Fragrans_-_%E0%B4%9C%E0%B4%BE%E0%B4%A4%E0%B4%BF%E0%B4%AE%E0%B4%B0%E0%B4%82.JPG",
+        fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/3/3e/Mace_%28%E0%A6%9C%E0%A6%AF%E0%A6%BC%E0%A6%BF%E0%A6%A4%E0%A7%8D%E0%A6%B0%E0%A6%BF%29.JPG",
         general_info: "Nutmeg is an evergreen tropical tree native to the Banda Islands of Indonesia, growing 5-13 meters tall. Dioecious (separate male and female trees) with one male needed for 5-10 female trees. Produces fleshy fruits containing single seed (nutmeg) surrounded by red aril (mace). Both nutmeg and mace are valuable spices. Tree takes 15-20 years to reach full production. Historically one of world's most valuable spices, sparking European colonial expansion.",
         cultivation_tips: "Requires tropical climate with temperatures 70-85°F year-round. Needs high humidity (70%+) and well-distributed rainfall 60+ inches annually. Plant in rich, well-draining volcanic or loamy soil with pH 6.0-7.0. Prefers partial shade when young, full sun when mature. Space trees 25-30 feet apart. Requires both male and female trees for fruit production. Very slow growing - patience required.",
         pest_management: "Susceptible to scale insects, mites, and borers. Fungal diseases possible in overly humid conditions with poor air circulation. Root rot in waterlogged soils. Monitor for nutmeg bark borer which can seriously damage trees. Use integrated pest management approach. Proper spacing and pruning improve air circulation.",
