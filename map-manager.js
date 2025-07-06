@@ -994,12 +994,17 @@ window.MapManager = (function() {
                         flex-direction: column;
                         background: white;
                         position: relative;
-                        padding: 20px;
+                        padding: 15px;
                     }
                     
                     .print-page:last-child {
                         page-break-after: avoid;
                         min-height: auto;
+                    }
+                    
+                    .print-page.map-page {
+                        justify-content: center;
+                        align-items: center;
                     }
                     
                     .print-title {
@@ -1016,9 +1021,13 @@ window.MapManager = (function() {
                         border: 2px solid #2d8f64;
                         border-radius: 10px;
                         position: relative;
-                        min-height: 400px;
+                        min-height: 500px;
                         overflow: hidden;
-                        margin: 20px 0;
+                        margin: 20px auto;
+                        transform: rotate(90deg);
+                        transform-origin: center;
+                        width: 85%;
+                        height: 70vh;
                     }
                     
                     .map-background {
@@ -1156,7 +1165,7 @@ window.MapManager = (function() {
                     <button class="secondary" onclick="window.close()">✕ Close</button>
                 </div>
                 
-                <div class="print-page">
+                <div class="print-page map-page">
                     <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
                     <div class="map-content">
                         <div class="map-background"></div>
@@ -1170,7 +1179,7 @@ window.MapManager = (function() {
                     </div>
                 </div>
                 
-                <div class="print-page">
+                <div class="print-page map-page">
                     <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
                     <div class="map-content">
                         <div class="map-background"></div>
