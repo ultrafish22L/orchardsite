@@ -943,13 +943,20 @@ window.MapManager = (function() {
             `;
         });
         
-        // Get the map image source for print
-        const mapImg = mapContainer.querySelector('img');
+        // Get the map image source for print - the map uses CSS background-image
         let mapImageSrc = 'giantslothorchard_map.png';
         
-        if (mapImg && mapImg.src) {
-            mapImageSrc = mapImg.src;
-            console.log('🖼️ Using map image source:', mapImageSrc);
+        // Try to get the background image from the map container's computed style
+        const computedStyle = window.getComputedStyle(mapContainer);
+        const backgroundImage = computedStyle.backgroundImage;
+        
+        if (backgroundImage && backgroundImage !== 'none') {
+            // Extract URL from CSS background-image property
+            const urlMatch = backgroundImage.match(/url\(['"]?([^'"]+)['"]?\)/);
+            if (urlMatch && urlMatch[1]) {
+                mapImageSrc = urlMatch[1];
+                console.log('🖼️ Using map background image:', mapImageSrc);
+            }
         } else {
             console.log('🖼️ Using fallback image path for printing');
         }
