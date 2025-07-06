@@ -252,25 +252,77 @@ window.WeatherManager = (function() {
         weatherPerformanceStats.apiCalls++;
 
         try {
-            // Try to get stations via proxy server first, fall back to mock data if not available
-            let stationsData = null;
-            let station = null;
+            // Use configured settings (which include environment variables loaded from server)
+            const apiKey = apiSettings.cloud.apiKey;
+            const apiSecret = apiSettings.cloud.apiSecret;
+            const stationId = apiSettings.cloud.stationId;
             
+            console.log('☁️ Making cloud API call for current conditions...');
+            
+            let currentResponse;
+            
+            // Try proxy server first (for local development), then direct API (for hosted)
             try {
-                // Use configured settings (which include environment variables loaded from server)
-                const apiKey = apiSettings.cloud.apiKey;
-                const apiSecret = apiSettings.cloud.apiSecret;
-                const stationId = apiSettings.cloud.stationId;
-                
-                console.log('☁️ Making cloud API call for current conditions...');
-                
-                // Get current conditions for the configured station
-                const currentResponse = await fetch(`/api/cloud/current/${stationId}`, {
+                // Try proxy server endpoint first
+                currentResponse = await fetch(`/api/cloud/current/${stationId}`, {
                     headers: {
                         'X-Api-Key': apiKey,
                         'X-Api-Secret': apiSecret
                     }
                 });
+                
+                if (!currentResponse.ok) {
+                    throw new Error(`Proxy server returned ${currentResponse.status}`);
+                }
+                console.log('☁️ Using proxy server for cloud API');
+            } catch (proxyError) {
+                console.log('☁️ Proxy server not available, trying direct WeatherLink API...');
+                
+                // Generate API signature for direct WeatherLink API call
+                const timestamp = Math.floor(Date.now() / 1000);
+                const parameters = { 'station-id': stationId };
+                
+                // Create signature using Web Crypto API
+                const sortedParams = Object.keys(parameters)
+                    .sort()
+                    .map(key => `${key}=${parameters[key]}`)
+                    .join('&');
+                
+                const dataToSign = `api-key${apiKey}t${timestamp}${sortedParams}`;
+                
+                // Use Web Crypto API for HMAC-SHA256
+                const encoder = new TextEncoder();
+                const keyData = encoder.encode(apiSecret);
+                const messageData = encoder.encode(dataToSign);
+                
+                const cryptoKey = await crypto.subtle.importKey(
+                    'raw',
+                    keyData,
+                    { name: 'HMAC', hash: 'SHA-256' },
+                    false,
+                    ['sign']
+                );
+                
+                const signatureBuffer = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
+                const signature = Array.from(new Uint8Array(signatureBuffer))
+                    .map(b => b.toString(16).padStart(2, '0'))
+                    .join('');
+                
+                // Make direct API call to WeatherLink
+                const directUrl = `https://api.weatherlink.com/v2/current/${stationId}?api-key=${apiKey}&t=${timestamp}&api-signature=${signature}`;
+                
+                currentResponse = await fetch(directUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!currentResponse.ok) {
+                    throw new Error(`WeatherLink API returned ${currentResponse.status}: ${currentResponse.statusText}`);
+                }
+                console.log('☁️ Using direct WeatherLink API');
+            }
                 
                 if (currentResponse.ok) {
                     const currentData = await currentResponse.json();
