@@ -52,45 +52,157 @@ window.MapManager = (function() {
     }
 
     function loadPlantPlacements() {
-        // In the future, this could load from mapdata.js file
-        // For now, start with empty placements
         try {
-            if (typeof mapPlants !== 'undefined' && Array.isArray(mapPlants)) {
-                console.log('📍 Found map data in global scope');
-                mapPlants.forEach(plant => {
+            // First try to load from localStorage
+            const savedData = localStorage.getItem('giantSlothOrchard_plantMap');
+            if (savedData) {
+                const mapData = JSON.parse(savedData);
+                if (Array.isArray(mapData)) {
+                    console.log('📍 Loading map data from localStorage');
+                    mapData.forEach(plant => {
+                        const plantId = 'plant_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        placedPlants[plantId] = plant;
+                    });
+                    console.log('✅ Map plant data loaded from localStorage:', Object.keys(placedPlants).length, 'plants');
+                    return;
+                }
+            }
+            
+            // Fallback to global scope (mapdata.js)
+            if (typeof window.mapPlants !== 'undefined' && Array.isArray(window.mapPlants)) {
+                console.log('📍 Loading map data from global scope (mapdata.js)');
+                window.mapPlants.forEach(plant => {
                     const plantId = 'plant_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
                     placedPlants[plantId] = plant;
                 });
-                console.log('✅ Map plant data loaded successfully:', Object.keys(placedPlants).length, 'plants');
+                console.log('✅ Map plant data loaded from file:', Object.keys(placedPlants).length, 'plants');
+                // Save to localStorage for future use
+                savePlantPlacements();
             } else {
                 console.log('📍 No existing map data found, starting fresh');
             }
         } catch (error) {
             console.log('📍 Error loading map data:', error);
+            // Try fallback to global scope
+            if (typeof window.mapPlants !== 'undefined' && Array.isArray(window.mapPlants)) {
+                window.mapPlants.forEach(plant => {
+                    const plantId = 'plant_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    placedPlants[plantId] = plant;
+                });
+                console.log('✅ Map plant data loaded from fallback:', Object.keys(placedPlants).length, 'plants');
+            }
         }
         placedPlants = placedPlants || {};
     }
 
     function savePlantPlacements() {
-        // In a real implementation, this would save to mapdata.js file
-        // For now, just keep in memory and log the data structure
-        const mapData = Object.values(placedPlants).filter(plant => !plant.isTemp);
-        console.log('💾 Plant placements saved (memory only):');
-        console.log('mapPlants = ', JSON.stringify(mapData, null, 2));
-        
-        // This is what would be written to mapdata.js:
-        // mapPlants = [
-        //   {
-        //     name: "Plant Name",
-        //     botanical: "Botanical Name", 
-        //     emoji: "🌱",
-        //     x: 100,
-        //     y: 150,
-        //     radius: 25,
-        //     diameter: 10
-        //   },
-        //   ...
-        // ];
+        try {
+            const mapData = Object.values(placedPlants).filter(plant => !plant.isTemp);
+            localStorage.setItem('giantSlothOrchard_plantMap', JSON.stringify(mapData));
+            console.log('💾 Plant placements saved to localStorage:', mapData.length, 'plants');
+        } catch (error) {
+            console.error('❌ Error saving plant placements to localStorage:', error);
+            // Fallback: log the data structure for manual recovery
+            const mapData = Object.values(placedPlants).filter(plant => !plant.isTemp);
+            console.log('💾 Plant placements (backup log):');
+            console.log('window.mapPlants = ', JSON.stringify(mapData, null, 2));
+        }
+    }
+
+    function downloadMapData() {
+        try {
+            const mapData = Object.values(placedPlants).filter(plant => !plant.isTemp);
+            const timestamp = new Date().toISOString().split('T')[0];
+            
+            // Create JavaScript file content
+            const fileContent = `// Giant Sloth Orchard - Plant Map Data
+// Downloaded on: ${new Date().toISOString()}
+// Plants: ${mapData.length}
+
+window.mapPlants = ${JSON.stringify(mapData, null, 4)};
+
+console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
+
+            // Create and download file
+            const blob = new Blob([fileContent], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `giant-sloth-orchard-map-${timestamp}.js`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            console.log('📥 Map data downloaded:', mapData.length, 'plants');
+        } catch (error) {
+            console.error('❌ Error downloading map data:', error);
+            alert('Error downloading map data. Check console for details.');
+        }
+    }
+
+    function uploadMapData() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.js,.json';
+        input.onchange = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let mapData;
+                    const content = e.target.result;
+                    
+                    if (file.name.endsWith('.js')) {
+                        // Extract array from JavaScript file
+                        const match = content.match(/window\.mapPlants\s*=\s*(\[[\s\S]*?\]);/);
+                        if (match) {
+                            mapData = JSON.parse(match[1]);
+                        } else {
+                            throw new Error('Could not find mapPlants array in JavaScript file');
+                        }
+                    } else {
+                        // Parse JSON file
+                        mapData = JSON.parse(content);
+                    }
+                    
+                    if (!Array.isArray(mapData)) {
+                        throw new Error('Map data must be an array');
+                    }
+                    
+                    // Clear existing plants and load new data
+                    placedPlants = {};
+                    mapData.forEach(plant => {
+                        const plantId = 'plant_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        placedPlants[plantId] = plant;
+                    });
+                    
+                    // Save to localStorage and re-render
+                    savePlantPlacements();
+                    renderMapPlants();
+                    
+                    console.log('📤 Map data uploaded successfully:', mapData.length, 'plants');
+                    alert(`Map data loaded successfully! ${mapData.length} plants imported.`);
+                    
+                } catch (error) {
+                    console.error('❌ Error uploading map data:', error);
+                    alert('Error loading map data: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
+
+    function clearMapData() {
+        if (confirm('Are you sure you want to clear all plants from the map? This cannot be undone.')) {
+            placedPlants = {};
+            localStorage.removeItem('giantSlothOrchard_plantMap');
+            renderMapPlants();
+            console.log('🗑️ Map data cleared');
+        }
     }
 
     function populatePlantDropdown() {
@@ -905,6 +1017,27 @@ window.MapManager = (function() {
         if (printBtn) {
             printBtn.addEventListener('click', printMap);
             console.log('✅ Print button listener added');
+        }
+
+        // Download button
+        const downloadBtn = document.getElementById('map-download-btn');
+        if (downloadBtn) {
+            downloadBtn.addEventListener('click', downloadMapData);
+            console.log('✅ Download button listener added');
+        }
+
+        // Upload button
+        const uploadBtn = document.getElementById('map-upload-btn');
+        if (uploadBtn) {
+            uploadBtn.addEventListener('click', uploadMapData);
+            console.log('✅ Upload button listener added');
+        }
+
+        // Clear button
+        const clearBtn = document.getElementById('map-clear-btn');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', clearMapData);
+            console.log('✅ Clear button listener added');
         }
         
         // Edit mode controls

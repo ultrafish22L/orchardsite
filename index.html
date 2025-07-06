@@ -83,6 +83,9 @@
                 <button class="nav-btn" id="map-edit-btn" title="Edit plant positions">✏️</button>
                 <button class="nav-btn" id="map-delete-btn" title="Delete selected plant from map">🗑️</button>
                 <button class="nav-btn" id="map-print-btn" title="Print map in 2 pages (portrait, rotated 90°)">🖨️</button>
+                <button class="nav-btn" id="map-download-btn" title="Download map data as backup file">💾</button>
+                <button class="nav-btn" id="map-upload-btn" title="Upload map data from backup file">📁</button>
+                <button class="nav-btn" id="map-clear-btn" title="Clear all plants from map">🗑️💥</button>
                 <div class="hidden" id="map-edit-controls">
                     <button class="nav-btn" id="map-cancel-btn" style="color: #ff6b6b;" title="Cancel plant map change">✕</button>
                     <button class="nav-btn" id="map-confirm-btn" style="color: #44ff44;" title="Confirm plant map change">✓</button>
@@ -492,6 +495,7 @@
     </footer>
 
     <!-- JavaScript Modules -->
+    <script src="mapdata.js"></script>
     <script src="plant-manager.js"></script>
     <script src="weather-manager.js"></script>
     <script src="map-manager.js"></script>
