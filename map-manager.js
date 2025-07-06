@@ -562,20 +562,12 @@ window.MapManager = (function() {
     }
 
     function confirmAddPlant() {
-        console.log('✅ Confirming add mode');
+        console.log('✅ Confirming add mode - exiting to normal mode');
         
-        if (!tempPlantData) {
-            console.log('❌ No plant to add');
-            alert('Please place a plant on the map first');
-            return;
-        }
-        
+        // In the new add mode, plants are placed immediately, so we just exit add mode
         mapMode = 'normal';
         selectedPlantForAddition = '';
-
-        const plantId = 'plant_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        placedPlants[plantId] = tempPlantData;
-        tempPlantData = null; // Reset temp plant data
+        tempPlantData = null; // Clear any temp data
 
         // Show all buttons, hide confirm/cancel
         showAllButtons();
@@ -586,9 +578,10 @@ window.MapManager = (function() {
             mapContainer.style.cursor = 'default';
         }
         
+        // Save any final changes and re-render
         savePlantPlacements();
         renderMapPlants();
-        console.log('✅ Plant added successfully');
+        console.log('✅ Exited add mode successfully');
     }
 
     function placePlantAtPosition(x, y) {
