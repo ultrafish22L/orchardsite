@@ -128,24 +128,17 @@ window.WeatherManager = (function() {
 
     // Check if API credentials are configured
     function areCloudCredentialsConfigured() {
-        // Check environment variables first (for server-side), then fall back to settings
-        const envApiKey = typeof process !== 'undefined' && process.env ? process.env.SLOTH_WEATHERLINK_KEY : null;
-        const envStationId = typeof process !== 'undefined' && process.env ? process.env.SLOTH_WEATHERLINK_STATION_ID : null;
-        const envApiSecret = typeof process !== 'undefined' && process.env ? process.env.SLOTH_WEATHERLINK_SECRET : null;
-        
-        const hasEnvCredentials = !!(envApiKey && envStationId && envApiSecret);
-        const hasSettingsCredentials = !!(apiSettings.cloud.apiKey && apiSettings.cloud.stationId && apiSettings.cloud.apiSecret);
+        // Check if credentials are configured in settings (includes env vars loaded from server)
+        const hasCredentials = !!(apiSettings.cloud.apiKey && apiSettings.cloud.stationId && apiSettings.cloud.apiSecret);
         
         console.log('🔍 Cloud credentials check:', {
-            envApiKey: envApiKey ? '***' : null,
-            envStationId: envStationId ? '***' : null,
-            envApiSecret: envApiSecret ? '***' : null,
-            hasEnvCredentials,
-            hasSettingsCredentials,
-            result: hasEnvCredentials || hasSettingsCredentials
+            hasApiKey: !!apiSettings.cloud.apiKey,
+            hasStationId: !!apiSettings.cloud.stationId,
+            hasApiSecret: !!apiSettings.cloud.apiSecret,
+            result: hasCredentials
         });
         
-        return hasEnvCredentials || hasSettingsCredentials;
+        return hasCredentials;
     }
 
     function areLocalCredentialsConfigured() {
@@ -176,9 +169,9 @@ window.WeatherManager = (function() {
             let station = null;
             
             try {
-                // Use environment variables if available, otherwise fall back to settings
-                const apiKey = (typeof process !== 'undefined' && process.env?.SLOTH_WEATHERLINK_KEY) || apiSettings.cloud.apiKey;
-                const apiSecret = (typeof process !== 'undefined' && process.env?.SLOTH_WEATHERLINK_SECRET) || apiSettings.cloud.apiSecret;
+                // Use configured settings (which include environment variables loaded from server)
+                const apiKey = apiSettings.cloud.apiKey;
+                const apiSecret = apiSettings.cloud.apiSecret;
                 
                 const stationsResponse = await fetch('/api/cloud/stations', {
                     headers: {
@@ -1113,14 +1106,26 @@ window.WeatherManager = (function() {
             }
             
             const envConfig = await response.json();
+            console.log('✅ Environment config loaded:', {
+                hasApiKey: !!envConfig.weatherlink?.apiKey,
+                hasStationId: !!envConfig.weatherlink?.stationId,
+                hasApiSecret: !!envConfig.weatherlink?.apiSecret
+            });
             
-            if (envConfig.weatherlink.hasCredentials) {
-                console.log('🔑 Found WeatherLink credentials in environment variables');
-                apiSettings.cloud.apiKey = envConfig.weatherlink.apiKey;
-                apiSettings.cloud.apiSecret = envConfig.weatherlink.apiSecret;
-                console.log(`🔑 Updated API Key: ${envConfig.weatherlink.apiKey.substring(0, 8)}...`);
-            } else {
-                console.log('🔧 No environment credentials found, using defaults');
+            // Update API settings with environment variables
+            if (envConfig.weatherlink) {
+                if (envConfig.weatherlink.apiKey) {
+                    apiSettings.cloud.apiKey = envConfig.weatherlink.apiKey;
+                    console.log(`🔑 Updated API Key: ${envConfig.weatherlink.apiKey.substring(0, 8)}...`);
+                }
+                if (envConfig.weatherlink.stationId) {
+                    apiSettings.cloud.stationId = envConfig.weatherlink.stationId;
+                    console.log(`🔑 Updated Station ID: ${envConfig.weatherlink.stationId}`);
+                }
+                if (envConfig.weatherlink.apiSecret) {
+                    apiSettings.cloud.apiSecret = envConfig.weatherlink.apiSecret;
+                    console.log(`🔑 Updated API Secret: ${envConfig.weatherlink.apiSecret.substring(0, 8)}...`);
+                }
             }
             
         } catch (error) {

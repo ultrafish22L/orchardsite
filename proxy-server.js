@@ -58,6 +58,42 @@ function generateApiSignature(apiKey, apiSecret, timestamp, parameters = {}) {
     return signature;
 }
 
+// Environment configuration endpoint
+app.get('/api/config/env', (req, res) => {
+    console.log('🔧 Environment config requested');
+    
+    const envConfig = {
+        weatherlink: {
+            apiKey: process.env.SLOTH_WEATHERLINK_KEY || null,
+            stationId: process.env.SLOTH_WEATHERLINK_STATION_ID || null,
+            apiSecret: process.env.SLOTH_WEATHERLINK_SECRET || null
+        }
+    };
+    
+    // Only send non-null values
+    const filteredConfig = {
+        weatherlink: {}
+    };
+    
+    if (envConfig.weatherlink.apiKey) {
+        filteredConfig.weatherlink.apiKey = envConfig.weatherlink.apiKey;
+    }
+    if (envConfig.weatherlink.stationId) {
+        filteredConfig.weatherlink.stationId = envConfig.weatherlink.stationId;
+    }
+    if (envConfig.weatherlink.apiSecret) {
+        filteredConfig.weatherlink.apiSecret = envConfig.weatherlink.apiSecret;
+    }
+    
+    console.log('🔧 Sending environment config:', {
+        hasApiKey: !!filteredConfig.weatherlink.apiKey,
+        hasStationId: !!filteredConfig.weatherlink.stationId,
+        hasApiSecret: !!filteredConfig.weatherlink.apiSecret
+    });
+    
+    res.json(filteredConfig);
+});
+
 // Enhanced WeatherLink v2 Cloud API proxy
 app.use('/api/cloud/*', async (req, res) => {
     try {
