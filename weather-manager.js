@@ -428,75 +428,11 @@ window.WeatherManager = (function() {
                     break;
                     
                 case 'cloud':
-                    // Check if we're in standalone mode first
-                    if (window.location.protocol === 'file:') {
-                        console.log('☁️ Cloud weather not available in standalone mode, switching to demo mode');
-                        currentWeatherMode = 'demo';
-                        activeWeatherMode = 'demo';
-                        generateMockData();
-                        updateWeatherStatus('Demo Mode - Cloud weather not available in standalone mode', true);
-                        updateFooterWeatherStatus();
-                        // Reset polling interval to demo mode frequency
-                        if (weatherUpdateInterval) {
-                            clearInterval(weatherUpdateInterval);
-                        }
-                        startWeatherUpdates();
-                        break;
-                    }
-                    
-                    // Check credentials before attempting connection
-                    if (!areCloudCredentialsConfigured()) {
-                        console.log('☁️ Cloud credentials not configured, switching to demo mode');
-                        currentWeatherMode = 'demo';
-                        activeWeatherMode = 'demo';
-                        generateMockData();
-                        updateWeatherStatus('Demo Mode - Cloud credentials not configured', true);
-                        updateFooterWeatherStatus();
-                        // Reset polling interval to demo mode frequency
-                        if (weatherUpdateInterval) {
-                            clearInterval(weatherUpdateInterval);
-                        }
-                        startWeatherUpdates();
-                    } else {
-                        await fetchCloudData();
-                    }
+                    await fetchCloudData();
                     break;
                     
                 case 'local':
-                    // Check if we're in standalone mode first
-                    if (window.location.protocol === 'file:') {
-                        console.log('🏠 Local weather not available in standalone mode, switching to demo mode');
-                        currentWeatherMode = 'demo';
-                        activeWeatherMode = 'demo';
-                        generateMockData();
-                        updateWeatherStatus('Demo Mode - Local weather not available in standalone mode', true);
-                        updateFooterWeatherStatus();
-                        // Reset polling interval to demo mode frequency
-                        if (weatherUpdateInterval) {
-                            clearInterval(weatherUpdateInterval);
-                        }
-                        startWeatherUpdates();
-                        break;
-                    }
-                    
-                    // Check credentials before attempting connection
-                    if (!areLocalCredentialsConfigured()) {
-                        throw new Error('Local API IP address not configured. Please configure device IP address in weather settings.');
-                    }
-                    
-                    // Set a flag to track if we should go red immediately on first failure
-                    let shouldGoRedImmediately = (isInitialConnection || isSwitchingModes);
-                    
-                    try {
-                        await fetchLocalData();
-                    } catch (localError) {
-                        // If this is a new connection attempt and we get immediate failure, go red right away
-                        if (shouldGoRedImmediately && (localError.message.includes('ERR_CONNECTION_REFUSED') || localError.message.includes('Failed to fetch'))) {
-                            console.log('🔴 Going red immediately on first connection failure');
-                            updateWeatherStatus(`Connection Failed: ${localError.message}`, false, false);
-                        }
-                        throw localError; // Re-throw to be handled by main error handler
-                    }
+                    await fetchLocalData();
                     break;
                     
                 case 'auto':
