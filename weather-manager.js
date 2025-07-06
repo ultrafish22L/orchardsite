@@ -492,8 +492,8 @@ window.WeatherManager = (function() {
             console.error('❌ Weather data update failed:', error);
             consecutiveFailures++;
             
-            // For configuration errors, stop polling and show clear error message
-            if (error.message.includes('not configured')) {
+            // For configuration errors and standalone mode errors, stop polling and show clear error message
+            if (error.message.includes('not configured') || error.message.includes('not available in standalone mode')) {
                 updateWeatherStatus(`Configuration Required: ${error.message}`, false, false);
                 
                 // Stop polling for configuration errors to prevent spam
