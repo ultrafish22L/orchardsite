@@ -1538,5 +1538,18 @@ window.plantsDatabase = [
         cultivation_tips: "Strictly tropical, requires consistently warm temperatures above 0°C (32°F). Prefers deep, well-drained, organic-rich soil with good moisture retention. Partial shade when young, full sun when mature. Challenging in Hawaii due to specific climate requirements, best in protected locations. Consistent moisture essential, sensitive to both drought and waterlogging. Allow ample space for large mature size. Very slow-growing, takes 10-20 years to fruit from seed. Extremely slow establishment but long-term producer. Cannot tolerate any frost or extended cool periods.",
         pest_management: "Sensitive to root rot in poorly drained soils. Highly sensitive to temperature fluctuations and drought. Monitor for scale insects and tropical fruit pests. Ensure excellent drainage to prevent root diseases. Protect from any temperature extremes. Minimal pest issues but requires optimal growing conditions. Focus on maintaining ideal environmental conditions rather than pest control.",
         pruning_guidelines: "Requires very little pruning due to naturally good form. Light shaping when young to develop strong framework. Remove only dead, diseased, or crossing branches. Prune minimally during dry periods. Avoid heavy pruning as trees are slow to recover. Allow tree to develop its natural pyramidal shape. Minimal intervention to avoid stress on slow-growing tree."
+    },
+    {
+        name: "Dragon Fruit",
+        botanical: "Selenicereus undatus",
+        category: "fruit",
+        info_url: "https://en.wikipedia.org/wiki/Pitaya",
+        fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/4/43/Pitaya_cross_section_ed2.jpg",
+        emoji: "🐉",
+        rare: true,
+        general_info: "Dragon Fruit (*Selenicereus undatus*), also known as pitaya or strawberry pear, is a climbing cactus native to Central America. Produces striking white-fleshed fruits with black seeds and bright pink or red skin covered in scale-like bracts. The fruit has a mild, sweet flavor often compared to kiwi or pear. Night-blooming cactus with large, fragrant white flowers that open only at night. Widely cultivated throughout tropical and subtropical regions worldwide.",
+        cultivation_tips: "Thrives in tropical to subtropical climates with temperatures between 65-85°F (18-29°C). Requires well-draining soil and can tolerate drought once established. Needs support structure as it's a climbing cactus that can reach 20 feet. Full sun to partial shade. Benefits from regular watering during growing season but avoid waterlogging. Can be grown in large containers. Fruits typically develop 30-50 days after flowering.",
+        pest_management: "Generally pest-resistant but monitor for scale insects, mealybugs, and aphids. Watch for fungal issues in humid conditions with poor air circulation. Protect from snails and slugs which can damage young growth. Avoid overwatering to prevent root rot. Strong winds can damage the climbing stems.",
+        pruning_guidelines: "Regular pruning needed to manage size and shape on support structure. Remove dead, damaged, or diseased stems. Prune after fruiting season to encourage new growth. Can be trained along fences, trellises, or poles. Remove excess growth to improve air circulation and light penetration. Wear gloves when pruning due to small spines on stems."
     }
 ];
