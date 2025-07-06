@@ -660,8 +660,9 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         
         // Get plant size (diameter in feet)
         const diameter = getPlantDiameter(plantData);
-        const radius = (diameter * mapConfig.mapScale) / 2;
-        console.log('📏 Plant dimensions:', { diameter, radius });
+        const height = getPlantHeight(plantData);
+        const radius = calculatePlantRadius(diameter);
+        console.log('📏 Plant dimensions:', { diameter, height, radius });
         
         // Create temp plant object (not added to placedPlants)
         tempPlantData = {
@@ -671,7 +672,8 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             x: x,
             y: y,
             radius: radius,
-            diameter: diameter
+            diameter: diameter,
+            height: height
         };
         
         console.log('✅ Temp plant data created (not in database)');
@@ -725,13 +727,17 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         console.log('✅ Found plant data:', plantData.name);
         
         // Create plant data object
-        const radius = getPlantDiameter(plantData) / 2;
+        const diameter = getPlantDiameter(plantData);
+        const height = getPlantHeight(plantData);
+        const radius = calculatePlantRadius(diameter);
         const emoji = getPlantEmoji(plantData);
         
         const newPlantData = {
             x: x,
             y: y,
             radius: radius,
+            diameter: diameter,
+            height: height,
             name: plantData.name,
             emoji: emoji
         };
@@ -748,8 +754,10 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
     }
 
     function getPlantDiameter(plantData) {
-        // Try to extract diameter from various possible fields
+        // Use the new diameter field from database
         if (plantData.diameter) return parseFloat(plantData.diameter);
+        
+        // Legacy fallback for old data
         if (plantData.size) return parseFloat(plantData.size);
         if (plantData.mature_diameter) return parseFloat(plantData.mature_diameter);
         if (plantData.width) return parseFloat(plantData.width);
@@ -765,6 +773,75 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             case 'ornamental': return 6;
             default: return mapConfig.defaultPlantSize;
         }
+    }
+
+    function getPlantHeight(plantData) {
+        // Use the new height field from database
+        if (plantData.height) return parseFloat(plantData.height);
+        
+        // Fallback based on category
+        switch (plantData.category) {
+            case 'bananas': return 12;
+            case 'citrus': return 10;
+            case 'theobroma': return 20;
+            case 'fruit': return 15;
+            case 'herbs': return 3;
+            case 'carnivorous': return 0.5;
+            case 'ornamental': return 6;
+            default: return 8;
+        }
+    }
+
+    function getPlantBaseColor(plantData) {
+        // Use the new base_color field from database
+        if (plantData.base_color) return plantData.base_color;
+        
+        // Fallback based on category
+        switch (plantData.category) {
+            case 'bananas': return '#FFD700';
+            case 'citrus': return '#FFA500';
+            case 'theobroma': return '#8B4513';
+            case 'fruit': return '#32CD32';
+            case 'herbs': return '#9ACD32';
+            case 'carnivorous': return '#FF0000';
+            case 'ornamental': return '#FF69B4';
+            default: return '#7fffd4';
+        }
+    }
+
+    function calculatePlantRadius(diameter) {
+        // Map scale: 455x125 feet farm
+        // Convert diameter in feet to pixels for map display
+        const mapWidthFeet = 455;
+        const mapHeightFeet = 125;
+        const mapWidthPixels = 910; // Approximate map container width
+        const mapHeightPixels = 250; // Approximate map container height
+        
+        // Use the smaller scale to ensure plants fit properly
+        const scaleX = mapWidthPixels / mapWidthFeet;
+        const scaleY = mapHeightPixels / mapHeightFeet;
+        const scale = Math.min(scaleX, scaleY);
+        
+        // Convert diameter to radius in pixels
+        const radiusPixels = (diameter * scale) / 2;
+        
+        // Ensure minimum and maximum sizes for visibility
+        return Math.max(8, Math.min(radiusPixels, 50));
+    }
+
+    function calculatePlantOpacity(height) {
+        // Taller plants = darker (higher opacity)
+        // Height range: 0.2 feet (tiny plants) to 40 feet (large trees)
+        const minHeight = 0.2;
+        const maxHeight = 40;
+        const minOpacity = 0.3;
+        const maxOpacity = 0.8;
+        
+        // Normalize height to 0-1 range
+        const normalizedHeight = Math.max(0, Math.min(1, (height - minHeight) / (maxHeight - minHeight)));
+        
+        // Calculate opacity
+        return minOpacity + (normalizedHeight * (maxOpacity - minOpacity));
     }
 
     function getPlantEmoji(plantData) {
@@ -896,6 +973,14 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             
             console.log('🌱 Rendering permanent plant:', id, plant.name);
             
+            // Get plant data from database for styling
+            const plantData = window.plantsDatabase?.find(p => p.name === plant.name) || {};
+            const height = getPlantHeight(plantData);
+            const diameter = getPlantDiameter(plantData);
+            const baseColor = getPlantBaseColor(plantData);
+            const radius = calculatePlantRadius(diameter);
+            const opacity = calculatePlantOpacity(height);
+            
             const plantElement = document.createElement('div');
             plantElement.className = 'map-plant';
             plantElement.dataset.plantId = id;
@@ -904,13 +989,14 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
                 plantElement.classList.add('selected');
             }
             
-            plantElement.style.left = (plant.x - plant.radius) + 'px';
-            plantElement.style.top = (plant.y - plant.radius) + 'px';
-            plantElement.style.width = (plant.radius * 2) + 'px';
-            plantElement.style.height = (plant.radius * 2) + 'px';
+            // Use calculated radius instead of stored radius
+            plantElement.style.left = (plant.x - radius) + 'px';
+            plantElement.style.top = (plant.y - radius) + 'px';
+            plantElement.style.width = (radius * 2) + 'px';
+            plantElement.style.height = (radius * 2) + 'px';
             
             plantElement.innerHTML = `
-                <div class="map-plant-circle">
+                <div class="map-plant-circle" style="background-color: ${baseColor}; opacity: ${opacity};">
                     <div class="map-plant-emoji">${plant.emoji}</div>
                 </div>
             `;
@@ -922,17 +1008,26 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         Object.entries(tempDeleteList).forEach(([id, plant]) => {
             console.log('🗑️ Rendering plant marked for deletion:', id, plant.name);
             
+            // Get plant data from database for styling
+            const plantData = window.plantsDatabase?.find(p => p.name === plant.name) || {};
+            const height = getPlantHeight(plantData);
+            const diameter = getPlantDiameter(plantData);
+            const baseColor = getPlantBaseColor(plantData);
+            const radius = calculatePlantRadius(diameter);
+            const opacity = calculatePlantOpacity(height) * 0.6; // Dimmer for deletion
+            
             const plantElement = document.createElement('div');
             plantElement.className = 'map-plant marked-for-deletion';
             plantElement.dataset.plantId = id;
             
-            plantElement.style.left = (plant.x - plant.radius) + 'px';
-            plantElement.style.top = (plant.y - plant.radius) + 'px';
-            plantElement.style.width = (plant.radius * 2) + 'px';
-            plantElement.style.height = (plant.radius * 2) + 'px';
+            // Use calculated radius instead of stored radius
+            plantElement.style.left = (plant.x - radius) + 'px';
+            plantElement.style.top = (plant.y - radius) + 'px';
+            plantElement.style.width = (radius * 2) + 'px';
+            plantElement.style.height = (radius * 2) + 'px';
             
             plantElement.innerHTML = `
-                <div class="map-plant-circle">
+                <div class="map-plant-circle" style="background-color: ${baseColor}; opacity: ${opacity}; border-color: #ff6b6b;">
                     <div class="map-plant-emoji">${plant.emoji}</div>
                 </div>
             `;
@@ -944,17 +1039,26 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         if (tempPlantData) {
             console.log('🟡 Rendering temp plant:', tempPlantData.name);
             
+            // Get plant data from database for styling
+            const plantData = window.plantsDatabase?.find(p => p.name === tempPlantData.name) || {};
+            const height = getPlantHeight(plantData);
+            const diameter = getPlantDiameter(plantData);
+            const baseColor = getPlantBaseColor(plantData);
+            const radius = calculatePlantRadius(diameter);
+            const opacity = calculatePlantOpacity(height) * 0.8; // Slightly dimmer for temp
+            
             const plantElement = document.createElement('div');
             plantElement.className = 'map-plant temp';
             plantElement.dataset.plantId = 'temp';
             
-            plantElement.style.left = (tempPlantData.x - tempPlantData.radius) + 'px';
-            plantElement.style.top = (tempPlantData.y - tempPlantData.radius) + 'px';
-            plantElement.style.width = (tempPlantData.radius * 2) + 'px';
-            plantElement.style.height = (tempPlantData.radius * 2) + 'px';
+            // Use calculated radius instead of stored radius
+            plantElement.style.left = (tempPlantData.x - radius) + 'px';
+            plantElement.style.top = (tempPlantData.y - radius) + 'px';
+            plantElement.style.width = (radius * 2) + 'px';
+            plantElement.style.height = (radius * 2) + 'px';
             
             plantElement.innerHTML = `
-                <div class="map-plant-circle">
+                <div class="map-plant-circle" style="background-color: ${baseColor}; opacity: ${opacity}; border-color: #ffff44;">
                     <div class="map-plant-emoji">${tempPlantData.emoji}</div>
                 </div>
             `;

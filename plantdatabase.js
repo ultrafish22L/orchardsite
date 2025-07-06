@@ -6,6 +6,9 @@ window.plantsDatabase = [
         category: "bananas",
         emoji: "🍌",
         rare: false,
+        height: 12.5, // feet - average of 10-15 feet
+        diameter: 8, // feet - mature spread
+        base_color: "#FFD700", // golden yellow for banana
         plant_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-1.jpg",
         flower_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-2.jpg",
         info_url: "https://tropicalplantae.com/shop/the-hua-moa-banana-hawaiian-plantain-musa-acuminata-live-plant/",
@@ -20,6 +23,9 @@ window.plantsDatabase = [
         category: "bananas",
         emoji: "🍌",
         rare: false,
+        height: 7.5, // feet
+        diameter: 6, // feet - mature spread
+        base_color: "#F0E68C", // unique color for this plant
         plant_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-1.jpg",
         flower_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-2.jpg",
         info_url: "https://www.ourhouseplants.com/plants/musa-banana",
@@ -34,6 +40,9 @@ window.plantsDatabase = [
         category: "bananas",
         emoji: "🍌",
         rare: false,
+        height: 12, // feet
+        diameter: 8, // feet - mature spread
+        base_color: "#DAA520", // unique color for this plant
         plant_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-1.jpg",
         flower_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-2.jpg",
         info_url: "https://gardenbeast.com/banana-tree-guide/",
@@ -48,6 +57,9 @@ window.plantsDatabase = [
         category: "bananas",
         emoji: "🍌",
         rare: false,
+        height: 10, // feet
+        diameter: 7, // feet - mature spread
+        base_color: "#FFE135", // unique color for this plant
         plant_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-1.jpg",
         flower_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-2.jpg",
         info_url: "https://gardenoracle.com/images/musa.html",
@@ -62,6 +74,9 @@ window.plantsDatabase = [
         category: "bananas",
         emoji: "🍌",
         rare: true,
+        height: 2.5, // feet
+        diameter: 3, // feet - mature spread
+        base_color: "#FFFF99", // unique color for this plant
         plant_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-1.jpg",
         flower_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-2.jpg",
         info_url: "https://greg.app/plant-care/musa-acuminata",
@@ -76,6 +91,9 @@ window.plantsDatabase = [
         category: "bananas",
         emoji: "🍌",
         rare: true,
+        height: 6, // feet
+        diameter: 5, // feet - mature spread
+        base_color: "#8B0000", // unique color for this plant
         plant_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-1.jpg",
         flower_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-2.jpg",
         info_url: "https://en.wikipedia.org/wiki/Blood_banana",
@@ -90,6 +108,9 @@ window.plantsDatabase = [
         category: "bananas",
         emoji: "🍌",
         rare: false,
+        height: 8, // feet
+        diameter: 6, // feet - mature spread
+        base_color: "#FFB347", // unique color for this plant
         plant_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-1.jpg",
         flower_photo: "https://wildlifeofhawaii.com/images/flowers/Musa-acuminata-2.jpg",
         info_url: "https://www.logees.com/banana-tree-plants",
@@ -131,6 +152,9 @@ window.plantsDatabase = [
         name: "Lime",
         botanical: "Citrus aurantifolia",
         category: "citrus",
+        height: 8, // feet
+        diameter: 6, // feet - mature spread
+        base_color: "#00FF00", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/8/8b/Citrus_aurantifolia.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Dayap_or_Philippine_keylime.jpg",
         emoji: "🍈",
@@ -145,6 +169,9 @@ window.plantsDatabase = [
         name: "Orange",
         botanical: "Citrus sinensis",
         category: "citrus",
+        height: 12, // feet
+        diameter: 10, // feet - mature spread
+        base_color: "#FFA500", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/e/e2/Orange_tree.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/4/42/Citrus_sinensis.jpg",
         emoji: "🍊",
@@ -159,6 +186,9 @@ window.plantsDatabase = [
         name: "Kaffir Lime",
         botanical: "Citrus hystrix",
         category: "citrus",
+        height: 8, // feet
+        diameter: 6, // feet - mature spread
+        base_color: "#228B22", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/a/a1/Kaffir_Lime_%28Citrus_hystrix%29_1.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/d/df/Citrus_hystrix_DC._%28AM_AK305877-3%29.jpg",
         emoji: "🍈",
@@ -356,6 +386,9 @@ window.plantsDatabase = [
         botanical: "Diospyros nigra",
         category: "fruit",
         info_url: "https://edis.ifas.ufl.edu/publication/HS305",
+        height: 20, // feet
+        diameter: 15, // feet - mature spread
+        base_color: "#2F4F4F", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Black_Sapote_1.JPG",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/c/cb/BlackSapote_Cupidon1_Asit.jpg",
         emoji: "🖤",
@@ -531,6 +564,9 @@ window.plantsDatabase = [
         name: "Guava",
         botanical: "Psidium guajava",
         category: "fruit",
+        height: 12, // feet
+        diameter: 10, // feet - mature spread
+        base_color: "#FFB6C1", // unique color for this plant
         plant_photo: "https://wildlifeofhawaii.com/images/flowers/Psidium-guajava-1.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/6/60/Psidium_guajava.jpg",
         fruit_photo: "https://wildlifeofhawaii.com/images/flowers/Psidium-guajava-2.jpg",
@@ -560,6 +596,9 @@ window.plantsDatabase = [
         botanical: "Carica papaya",
         category: "fruit",
         info_url: "https://www.ctahr.hawaii.edu/oc/freepubs/pdf/f_n-3.pdf",
+        height: 15, // feet
+        diameter: 8, // feet - mature spread
+        base_color: "#FFA500", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/9/91/Carica_papaya.jpg",
         flower_photo: "https://wildlifeofhawaii.com/images/flowers/Carica-papaya-1.jpg",
         fruit_photo: "https://www.hawaiiantropicalplants.com/PHOTOS/Carica_papaya.jpg",
@@ -575,6 +614,9 @@ window.plantsDatabase = [
         botanical: "Morus",
         category: "fruit",
         info_url: "https://plantpono.org/hpwra/morus-alba/",
+        height: 20, // feet
+        diameter: 15, // feet - mature spread
+        base_color: "#8B008B", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/0/0a/Morus-alba.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/2/21/%D8%AA%D9%88%D8%AA_%D8%AE%D8%B1%D8%A7%D8%B3%D8%A7%D9%86.jpg",
         emoji: "🫐",
@@ -601,6 +643,9 @@ window.plantsDatabase = [
         name: "Avocado",
         botanical: "Persea americana",
         category: "fruit",
+        height: 25, // feet
+        diameter: 20, // feet - mature spread
+        base_color: "#228B22", // unique color for this plant
         plant_photo: "https://wildlifeofhawaii.com/images/flowers/Persea-americana-3.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/0/06/Persea_americana.jpg",
         fruit_photo: "https://wildlifeofhawaii.com/images/flowers/Persea-americana-2.jpg",
@@ -616,6 +661,9 @@ window.plantsDatabase = [
         name: "Mango",
         botanical: "Mangifera indica",
         category: "fruit",
+        height: 30, // feet
+        diameter: 25, // feet - mature spread
+        base_color: "#FF8C00", // unique color for this plant
         plant_photo: "https://wildlifeofhawaii.com/images/flowers/Mangifera-indica-1.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/2/25/Mangifera_indica.jpg",
         fruit_photo: "https://wildlifeofhawaii.com/images/flowers/Mangifera-indica-4.jpg",
@@ -632,6 +680,9 @@ window.plantsDatabase = [
         botanical: "Vanilla planifolia",
         category: "herbs",
         info_url: "https://plantpono.org/hpwra/vanilla-planifolia/",
+        height: 15, // feet
+        diameter: 4, // feet - mature spread
+        base_color: "#DDA0DD", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Vanilla_planifolia_vine.jpg/512px-Vanilla_planifolia_vine.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/0/0f/Vanilla_planifolia_%286998639597%29.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/8/8e/Vanilla_planifolia_cluster_of_green_pods.JPG",
@@ -661,6 +712,9 @@ window.plantsDatabase = [
         botanical: "Elettaria cardamomum",
         category: "herbs,ornamental",
         info_url: "https://plantpono.org/pono-plants/elettaria-cardamomum-cardamom/",
+        height: 6, // feet
+        diameter: 4, // feet - mature spread
+        base_color: "#9ACD32", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/9/9c/Cardamom_plant.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/7/72/Cardamone.jpg",
         emoji: "🌿",
@@ -674,6 +728,9 @@ window.plantsDatabase = [
         name: "Galangal",
         botanical: "Alpinia galanga",
         category: "herbs,ornamental",
+        height: 4, // feet
+        diameter: 3, // feet - mature spread
+        base_color: "#F4A460", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Alpinia_galanga%2C_bloeiwyse%2C_Manie_van_der_Schijff_BT.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Alpinia_galanga%2C_bloeiwyse%2C_Manie_van_der_Schijff_BT.jpg",
         info_url: "https://plantpono.org/pono-plants/alpinia-galanga-galangal/",
@@ -689,6 +746,9 @@ window.plantsDatabase = [
         botanical: "Bergera koenigii",
         category: "herbs",
         info_url: "https://en.wikipedia.org/wiki/Curry_tree",
+        height: 8, // feet
+        diameter: 6, // feet - mature spread
+        base_color: "#006400", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Murraya_koenigii_tree.jpg/512px-Murraya_koenigii_tree.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Murraya_koenigii_flowers.jpg/512px-Murraya_koenigii_flowers.jpg",
         emoji: "🌿",
@@ -730,6 +790,9 @@ window.plantsDatabase = [
         botanical: "Curcuma longa",
         category: "herbs",
         info_url: "https://plantpono.org/pono-plants/curcuma-longa-turmeric/",
+        height: 3, // feet
+        diameter: 2, // feet - mature spread
+        base_color: "#FFD700", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Curcuma_longa_plant.jpg/512px-Curcuma_longa_plant.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Curcuma_longa_flowers.jpg/512px-Curcuma_longa_flowers.jpg",
         emoji: "🫚",
@@ -745,6 +808,9 @@ window.plantsDatabase = [
         category: "herbs",
         emoji: "🥜",
         rare: true,
+        height: 20, // feet
+        diameter: 15, // feet - mature spread
+        base_color: "#CD853F", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/3/37/Myristica_Fragrans_-_%E0%B4%9C%E0%B4%BE%E0%B4%A4%E0%B4%BF%E0%B4%AE%E0%B4%B0%E0%B4%82.JPG",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/3/3e/Mace_%28%E0%A6%9C%E0%A6%AF%E0%A6%BC%E0%A6%BF%E0%A6%A4%E0%A7%8D%E0%A6%B0%E0%A6%BF%29.JPG",
         general_info: "Nutmeg is an evergreen tropical tree native to the Banda Islands of Indonesia, growing 5-13 meters tall. Dioecious (separate male and female trees) with one male needed for 5-10 female trees. Produces fleshy fruits containing single seed (nutmeg) surrounded by red aril (mace). Both nutmeg and mace are valuable spices. Tree takes 15-20 years to reach full production. Historically one of world's most valuable spices, sparking European colonial expansion.",
@@ -770,6 +836,9 @@ window.plantsDatabase = [
         name: "Lemongrass",
         botanical: "Cymbopogon citratus",
         category: "herbs",
+        height: 4, // feet
+        diameter: 3, // feet - mature spread
+        base_color: "#ADFF2F", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Cymbopogon_citratus_-_Lemongrass_-_var-lemongrass-02.jpg/512px-Cymbopogon_citratus_-_Lemongrass_-_var-lemongrass-02.jpg",
         emoji: "🌾",
         rare: false,
@@ -1129,6 +1198,9 @@ window.plantsDatabase = [
         emoji: "⚫",
         rare: true,
         info_url: "https://tropical.theferns.info/viewtropical.php?id=Piper+nigrum",
+        height: 12, // feet
+        diameter: 6, // feet - mature spread
+        base_color: "#2F4F4F", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Piper_nigrum_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-107.jpg/512px-Piper_nigrum_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-107.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Piper_nigrum_flowers.jpg/512px-Piper_nigrum_flowers.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Piper_nigrum_fruits.jpg/512px-Piper_nigrum_fruits.jpg",
@@ -1144,6 +1216,9 @@ window.plantsDatabase = [
         emoji: "🌿",
         rare: true,
         info_url: "https://tropical.theferns.info/viewtropical.php?id=Syzygium+aromaticum",
+        height: 25, // feet
+        diameter: 20, // feet - mature spread
+        base_color: "#8B0000", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Syzygium_aromaticum_tree.jpg/512px-Syzygium_aromaticum_tree.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Syzygium_aromaticum_flowers.jpg/512px-Syzygium_aromaticum_flowers.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Syzygium_aromaticum_cloves.jpg/512px-Syzygium_aromaticum_cloves.jpg",
@@ -1173,6 +1248,9 @@ window.plantsDatabase = [
         category: "wishlist",
         emoji: "🍈",
         rare: false,
+        height: 30, // feet
+        diameter: 25, // feet - mature spread
+        base_color: "#DAA520", // unique color for this plant
         plant_photo: "https://www.hawaiiantropicalplants.com/PHOTOS/Artocarpus_heterophyllus.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/9/94/Artocarpus_heterophylla_flowers.JPG",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/1/18/Jackfruit_National_fruit_of_Bangladesh.jpg",
@@ -1366,6 +1444,9 @@ window.plantsDatabase = [
         name: "Sapodilla",
         botanical: "Manilkara zapota",
         category: "wishlist",
+        height: 20, // feet
+        diameter: 15, // feet - mature spread
+        base_color: "#D2691E", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Manilkara_zapota_tree.jpg/512px-Manilkara_zapota_tree.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Manilkara_zapota_flowers.jpg/512px-Manilkara_zapota_flowers.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Manilkara_zapota_fruits.jpg/512px-Manilkara_zapota_fruits.jpg",
@@ -1501,6 +1582,9 @@ window.plantsDatabase = [
         botanical: "Litchi chinensis",
         category: "fruit",
         info_url: "https://en.wikipedia.org/wiki/Lychee",
+        height: 15, // feet
+        diameter: 12, // feet - mature spread
+        base_color: "#FFB6C1", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/0/0d/Sonnerat_litchi.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Litchi_chinensis_flowers.jpg/512px-Litchi_chinensis_flowers.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Litchi_chinensis_fruits.jpg/512px-Litchi_chinensis_fruits.jpg",
@@ -1516,6 +1600,9 @@ window.plantsDatabase = [
         botanical: "Manilkara zapota",
         category: "fruit",
         info_url: "https://en.wikipedia.org/wiki/Manilkara_zapota",
+        height: 20, // feet
+        diameter: 15, // feet - mature spread
+        base_color: "#D2691E", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/c/c7/Sapodilla_tree.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Manilkara_zapota_flowers.jpg/512px-Manilkara_zapota_flowers.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Manilkara_zapota_fruits.jpg/512px-Manilkara_zapota_fruits.jpg",
@@ -1531,6 +1618,9 @@ window.plantsDatabase = [
         botanical: "Garcinia mangostana",
         category: "fruit",
         info_url: "https://en.wikipedia.org/wiki/Purple_mangosteen",
+        height: 25, // feet
+        diameter: 20, // feet - mature spread
+        base_color: "#8B008B", // unique color for this plant
         plant_photo: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Pokok_manggis.jpg",
         flower_photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Garcinia_mangostana_flowers.jpg/512px-Garcinia_mangostana_flowers.jpg",
         fruit_photo: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Mangosteen_Basket.jpg",
