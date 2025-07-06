@@ -923,8 +923,12 @@ window.MapManager = (function() {
         const mapPlants = mapContainer.querySelectorAll('.map-plant');
         console.log('🌱 Found', mapPlants.length, 'plants on map');
         
-        // Create plant data for print
-        let plantsHTML = '';
+        // Create plant data for print - split between left and right halves
+        let leftPlantsHTML = '';
+        let rightPlantsHTML = '';
+        let leftPlantsList = [];
+        let rightPlantsList = [];
+        
         mapPlants.forEach((plant, index) => {
             const rect = plant.getBoundingClientRect();
             const containerRect = mapContainer.getBoundingClientRect();
@@ -936,21 +940,36 @@ window.MapManager = (function() {
             const emoji = plant.querySelector('.map-plant-emoji')?.textContent || '🌿';
             const plantName = plant.dataset.plantId || `Plant ${index + 1}`;
             
-            plantsHTML += `
-                <div class="print-plant" style="left: ${relativeX}%; top: ${relativeY}%;" title="${plantName}">
-                    <div class="print-plant-emoji">${emoji}</div>
-                </div>
-            `;
+            // Split plants based on X position (left half vs right half)
+            if (relativeX <= 50) {
+                // Left half - adjust X position to be relative to left half (0-100%)
+                const adjustedX = (relativeX / 50) * 100;
+                leftPlantsHTML += `
+                    <div class="print-plant" style="left: ${adjustedX}%; top: ${relativeY}%;" title="${plantName}">
+                        <div class="print-plant-emoji">${emoji}</div>
+                    </div>
+                `;
+                leftPlantsList.push({ emoji, plantName });
+            } else {
+                // Right half - adjust X position to be relative to right half (0-100%)
+                const adjustedX = ((relativeX - 50) / 50) * 100;
+                rightPlantsHTML += `
+                    <div class="print-plant" style="left: ${adjustedX}%; top: ${relativeY}%;" title="${plantName}">
+                        <div class="print-plant-emoji">${emoji}</div>
+                    </div>
+                `;
+                rightPlantsList.push({ emoji, plantName });
+            }
         });
         
-        // Create plant list HTML
-        const plantListHTML = mapPlants.length > 0 ? 
-            Array.from(mapPlants).map((plant, i) => {
-                const emoji = plant.querySelector('.map-plant-emoji')?.textContent || '🌿';
-                const plantId = plant.dataset.plantId || `Plant ${i + 1}`;
-                return `<div class="plant-item">${emoji} ${plantId}</div>`;
-            }).join('') 
-            : '<div class="plant-item">No plants currently placed on map</div>';
+        // Create plant list HTML for each half
+        const leftPlantListHTML = leftPlantsList.length > 0 ? 
+            leftPlantsList.map(plant => `<div class="plant-item">${plant.emoji} ${plant.plantName}</div>`).join('') 
+            : '<div class="plant-item">No plants on left half</div>';
+            
+        const rightPlantListHTML = rightPlantsList.length > 0 ? 
+            rightPlantsList.map(plant => `<div class="plant-item">${plant.emoji} ${plant.plantName}</div>`).join('') 
+            : '<div class="plant-item">No plants on right half</div>';
         
         // Create a new window for print preview
         const printWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes');
@@ -969,7 +988,7 @@ window.MapManager = (function() {
                 <title>Giant Sloth Orchard - Farm Map</title>
                 <style>
                     @page {
-                        size: portrait;
+                        size: landscape;
                         margin: 0.5in;
                     }
                     
@@ -1021,13 +1040,11 @@ window.MapManager = (function() {
                         border: 2px solid #2d8f64;
                         border-radius: 10px;
                         position: relative;
-                        min-height: 500px;
+                        min-height: 400px;
                         overflow: hidden;
                         margin: 20px auto;
-                        transform: rotate(90deg);
-                        transform-origin: center;
-                        width: 85%;
-                        height: 70vh;
+                        width: 90%;
+                        height: 60vh;
                     }
                     
                     .map-background {
@@ -1037,11 +1054,18 @@ window.MapManager = (function() {
                         width: 100%;
                         height: 100%;
                         background-image: url('giantslothorchard_map.png');
-                        background-size: cover;
-                        background-position: center;
+                        background-size: 200% 100%;
                         background-repeat: no-repeat;
                         opacity: 0.8;
                         z-index: 1;
+                    }
+                    
+                    .map-background.left-half {
+                        background-position: 0% center;
+                    }
+                    
+                    .map-background.right-half {
+                        background-position: 100% center;
                     }
                     
                     .print-plant {
@@ -1166,33 +1190,37 @@ window.MapManager = (function() {
                 </div>
                 
                 <div class="print-page map-page">
-                    <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
+                    <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Left Half - Page 1 of 2)</h2>
                     <div class="map-content">
-                        <div class="map-background"></div>
-                        ${plantsHTML}
+                        <div class="map-background left-half"></div>
+                        ${leftPlantsHTML}
                         <div class="map-title">Giant Sloth Orchard<br><small>Holualoa, Hawaii Island</small></div>
-                        <div class="map-subtitle">Exotic Tropical Plants & Rare Fruits</div>
+                        <div class="map-subtitle">Left Half - Exotic Tropical Plants & Rare Fruits</div>
                     </div>
                     <div class="plant-list">
-                        <h3>Current Plants on Farm</h3>
-                        ${plantListHTML}
+                        <h3>Plants on Left Half of Farm</h3>
+                        ${leftPlantListHTML}
                     </div>
                 </div>
                 
                 <div class="print-page map-page">
-                    <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
+                    <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Right Half - Page 2 of 2)</h2>
                     <div class="map-content">
-                        <div class="map-background"></div>
-                        ${plantsHTML}
+                        <div class="map-background right-half"></div>
+                        ${rightPlantsHTML}
                         <div class="map-title">Giant Sloth Orchard<br><small>Holualoa, Hawaii Island</small></div>
-                        <div class="map-subtitle">Visits by appointment only</div>
+                        <div class="map-subtitle">Right Half - Visits by appointment only</div>
                     </div>
                     <div class="plant-list">
-                        <h3>Contact Information</h3>
-                        <div class="plant-item">📍 Location: Holualoa, Hawaii Island</div>
-                        <div class="plant-item">📞 Visits: By appointment only</div>
-                        <div class="plant-item">🌺 Specializing in exotic tropical plants and rare fruits</div>
-                        <div class="plant-item">🦥 Giant sloths love cacao - supporting forest balance</div>
+                        <h3>Plants on Right Half of Farm</h3>
+                        ${rightPlantListHTML}
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;">
+                            <h4 style="margin: 0 0 5px 0; color: #2d8f64;">Contact Information</h4>
+                            <div class="plant-item">📍 Location: Holualoa, Hawaii Island</div>
+                            <div class="plant-item">📞 Visits: By appointment only</div>
+                            <div class="plant-item">🌺 Specializing in exotic tropical plants and rare fruits</div>
+                            <div class="plant-item">🦥 Giant sloths love cacao - supporting forest balance</div>
+                        </div>
                     </div>
                 </div>
                 
