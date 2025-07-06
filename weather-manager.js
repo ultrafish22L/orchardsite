@@ -440,6 +440,16 @@ window.WeatherManager = (function() {
                     break;
                     
                 case 'cloud':
+                    // Check if we're in standalone mode first
+                    if (window.location.protocol === 'file:') {
+                        console.log('☁️ Cloud weather not available in standalone mode, switching to demo mode');
+                        currentWeatherMode = 'demo';
+                        generateMockData();
+                        updateWeatherStatus('Demo Mode - Cloud weather not available in standalone mode', true);
+                        updateFooterWeatherStatus();
+                        break;
+                    }
+                    
                     // Check credentials before attempting connection
                     if (!areCloudCredentialsConfigured()) {
                         console.log('☁️ Cloud credentials not configured, switching to demo mode');
@@ -453,6 +463,16 @@ window.WeatherManager = (function() {
                     break;
                     
                 case 'local':
+                    // Check if we're in standalone mode first
+                    if (window.location.protocol === 'file:') {
+                        console.log('🏠 Local weather not available in standalone mode, switching to demo mode');
+                        currentWeatherMode = 'demo';
+                        generateMockData();
+                        updateWeatherStatus('Demo Mode - Local weather not available in standalone mode', true);
+                        updateFooterWeatherStatus();
+                        break;
+                    }
+                    
                     // Check credentials before attempting connection
                     if (!areLocalCredentialsConfigured()) {
                         throw new Error('Local API IP address not configured. Please configure device IP address in weather settings.');
@@ -795,6 +815,13 @@ window.WeatherManager = (function() {
     }
 
     function updateFooterWeatherStatus() {
+        // Check if DOM is ready
+        if (document.readyState === 'loading') {
+            console.log('🔧 DOM not ready, deferring footer update');
+            setTimeout(updateFooterWeatherStatus, 100);
+            return;
+        }
+        
         const footerLed = document.getElementById('footer-weather-led');
         const footerStatus = document.getElementById('footer-weather-status');
         const footerTemp = document.getElementById('footer-weather-temp');
