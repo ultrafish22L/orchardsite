@@ -47,7 +47,7 @@ window.WeatherManager = (function() {
             ip: '192.168.1.100', 
             port: '80', 
             https: false,
-            proxyUrl: 'http://localhost:3000'
+            proxyUrl: 'http://localhost:50783'
         }
     };
 
