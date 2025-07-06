@@ -943,6 +943,17 @@ window.MapManager = (function() {
             `;
         });
         
+        // Get the map image source for print
+        const mapImg = mapContainer.querySelector('img');
+        let mapImageSrc = 'giantslothorchard_map.png';
+        
+        if (mapImg && mapImg.src) {
+            mapImageSrc = mapImg.src;
+            console.log('🖼️ Using map image source:', mapImageSrc);
+        } else {
+            console.log('🖼️ Using fallback image path for printing');
+        }
+        
         // Try a different approach - create print content in current window
         const existingPrintContent = document.getElementById('print-content');
         if (existingPrintContent) {
@@ -1027,6 +1038,17 @@ window.MapManager = (function() {
                     margin: auto;
                 }
                 
+                .map-background-image {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    opacity: 0.8;
+                    z-index: 1;
+                }
+                
                 .print-plant {
                     position: absolute;
                     width: 20px;
@@ -1090,6 +1112,7 @@ window.MapManager = (function() {
             <div class="print-page">
                 <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
                 <div class="map-content page-1">
+                    <img class="map-background-image" src="${mapImageSrc}" alt="Farm Map">
                     ${plantsHTML}
                     <div class="map-title">Giant Sloth Orchard<br><small>Holualoa, Hawaii Island</small></div>
                     <div class="map-subtitle">Exotic Tropical Plants & Rare Fruits</div>
@@ -1110,6 +1133,7 @@ window.MapManager = (function() {
             <div class="print-page">
                 <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
                 <div class="map-content page-2">
+                    <img class="map-background-image" src="${mapImageSrc}" alt="Farm Map">
                     ${plantsHTML}
                     <div class="map-title">Giant Sloth Orchard<br><small>Holualoa, Hawaii Island</small></div>
                     <div class="map-subtitle">Visits by appointment only</div>
