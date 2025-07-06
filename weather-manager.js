@@ -428,10 +428,16 @@ window.WeatherManager = (function() {
                     break;
                     
                 case 'cloud':
+                    if (window.location.protocol === 'file:') {
+                        throw new Error('Cloud API not available in standalone mode. Please use server mode or switch to demo mode.');
+                    }
                     await fetchCloudData();
                     break;
                     
                 case 'local':
+                    if (window.location.protocol === 'file:') {
+                        throw new Error('Local API not available in standalone mode. Please use server mode or switch to demo mode.');
+                    }
                     await fetchLocalData();
                     break;
                     
