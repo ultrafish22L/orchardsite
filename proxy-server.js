@@ -581,6 +581,21 @@ app.get('/api/health', (req, res) => {
     res.json(health);
 });
 
+// Environment configuration endpoint
+app.get('/api/config/env', (req, res) => {
+    const envConfig = {
+        weatherlink: {
+            apiKey: process.env.SLOTH_WEATHERLINK_KEY || null,
+            apiSecret: process.env.SLOTH_WEATHERLINK_SECRET || null,
+            hasCredentials: !!(process.env.SLOTH_WEATHERLINK_KEY && process.env.SLOTH_WEATHERLINK_SECRET)
+        },
+        timestamp: new Date().toISOString()
+    };
+    
+    console.log(`🔧 Environment config requested - has credentials: ${envConfig.weatherlink.hasCredentials}`);
+    res.json(envConfig);
+});
+
 // Test endpoints
 app.get('/api/test/cloud', async (req, res) => {
     try {

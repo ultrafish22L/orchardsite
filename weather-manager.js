@@ -1044,26 +1044,74 @@ window.WeatherManager = (function() {
         }, 100);
     }
 
+    // Load environment variables from server
+    async function loadEnvironmentConfig() {
+        try {
+            console.log('🔧 Loading environment configuration...');
+            const response = await fetch('/api/config/env');
+            
+            if (!response.ok) {
+                console.warn('⚠️ Could not load environment config, using defaults');
+                return;
+            }
+            
+            const envConfig = await response.json();
+            
+            if (envConfig.weatherlink.hasCredentials) {
+                console.log('🔑 Found WeatherLink credentials in environment variables');
+                apiSettings.cloud.apiKey = envConfig.weatherlink.apiKey;
+                apiSettings.cloud.apiSecret = envConfig.weatherlink.apiSecret;
+                console.log(`🔑 Updated API Key: ${envConfig.weatherlink.apiKey.substring(0, 8)}...`);
+            } else {
+                console.log('🔧 No environment credentials found, using defaults');
+            }
+            
+        } catch (error) {
+            console.warn('⚠️ Error loading environment config:', error.message);
+        }
+    }
+
     function initializeWeather() {
         console.log('🌦️ Initializing weather system...');
-        loadWeatherSettings();
         
-        // Reset connection state on initialization
-        isInitialConnection = true;
-        consecutiveFailures = 0;
-        lastAttemptedMode = null;
-        updateWeatherStatus('Initializing...', false, true);
-        
-        // Initialize with demo data first
-        setTimeout(() => {
-            generateMockData();
-            updateWeatherWidgets();
-            updateWeatherPerformanceStats();
-            updateFooterWeatherStatus();
+        // Load environment config first, then settings
+        loadEnvironmentConfig().then(() => {
+            loadWeatherSettings();
             
-            // Start data polling
-            startWeatherDataPolling();
-        }, 500);
+            // Reset connection state on initialization
+            isInitialConnection = true;
+            consecutiveFailures = 0;
+            lastAttemptedMode = null;
+            updateWeatherStatus('Initializing...', false, true);
+            
+            // Initialize with demo data first
+            setTimeout(() => {
+                generateMockData();
+                updateWeatherWidgets();
+                updateWeatherPerformanceStats();
+                updateFooterWeatherStatus();
+                
+                // Start data polling
+                startWeatherDataPolling();
+            }, 500);
+        }).catch(error => {
+            console.error('❌ Error during weather initialization:', error);
+            // Fallback to normal initialization without env config
+            loadWeatherSettings();
+            
+            isInitialConnection = true;
+            consecutiveFailures = 0;
+            lastAttemptedMode = null;
+            updateWeatherStatus('Initializing...', false, true);
+            
+            setTimeout(() => {
+                generateMockData();
+                updateWeatherWidgets();
+                updateWeatherPerformanceStats();
+                updateFooterWeatherStatus();
+                startWeatherDataPolling();
+            }, 500);
+        });
     }
 
     function setupWeatherEventListeners() {
