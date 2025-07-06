@@ -323,50 +323,46 @@ window.WeatherManager = (function() {
                 }
                 console.log('☁️ Using direct WeatherLink API');
             }
-                
-                if (currentResponse.ok) {
-                    const currentData = await currentResponse.json();
-                    console.log('☁️ Cloud API response received:', currentData);
-                    
-                    // Parse real WeatherLink v2 response format
-                    if (currentData.sensors && currentData.sensors.length > 0) {
-                        const sensorData = currentData.sensors[0].data[0]; // First sensor, latest data
-                        
-                        weatherData = {
-                            temperature: sensorData.temp || sensorData.temp_out || 0,
-                            humidity: sensorData.hum || sensorData.hum_out || 0,
-                            pressure: sensorData.bar_sea_level || sensorData.bar || 0,
-                            windSpeed: sensorData.wind_speed_last || sensorData.wind_speed || 0,
-                            windDirection: sensorData.wind_dir_last || sensorData.wind_dir || 0,
-                            rainfall: sensorData.rainfall_last_15_min || sensorData.rain_rate || 0,
-                            uvIndex: sensorData.uv_index || 0,
-                            solar: sensorData.solar_rad || 0,
-                            battery: sensorData.battery_volt ? Math.min(100, Math.max(0, (sensorData.battery_volt / 12) * 100)) : 0,
-                            indoorTemp: sensorData.temp_in || sensorData.temp || 0,
-                            indoorHumidity: sensorData.hum_in || sensorData.hum || 0
-                        };
-                        
-                        weatherPerformanceStats.successfulCalls++;
-                        weatherPerformanceStats.avgResponseTime = Math.round((Date.now() - startTime + weatherPerformanceStats.avgResponseTime) / 2);
-                        weatherPerformanceStats.lastUpdate = new Date();
-                        
-                        // Success - update active mode and status
-                        activeWeatherMode = 'cloud';
-                        updateWeatherStatus('Connected - Cloud API', true);
-                        return; // Exit early on success
-                    } else {
-                        throw new Error('No sensor data received from Cloud API - check station ID');
-                    }
-                } else {
-                    const errorText = await currentResponse.text().catch(() => 'Unable to read error details');
-                    throw new Error(`Cloud API returned ${currentResponse.status}: ${currentResponse.statusText} - ${errorText}`);
-                }
-            } catch (proxyError) {
-                console.log('🔄 Cloud API failed:', proxyError.message);
-                throw proxyError; // Re-throw to be handled by caller
-            }
             
-            console.log('☁️ Cloud API data fetched successfully:', weatherData);
+            // Process the response (whether from proxy or direct API)
+            if (currentResponse.ok) {
+                const currentData = await currentResponse.json();
+                console.log('☁️ Cloud API response received:', currentData);
+                
+                // Parse real WeatherLink v2 response format
+                if (currentData.sensors && currentData.sensors.length > 0) {
+                    const sensorData = currentData.sensors[0].data[0]; // First sensor, latest data
+                    
+                    weatherData = {
+                        temperature: sensorData.temp || sensorData.temp_out || 0,
+                        humidity: sensorData.hum || sensorData.hum_out || 0,
+                        pressure: sensorData.bar_sea_level || sensorData.bar || 0,
+                        windSpeed: sensorData.wind_speed_last || sensorData.wind_speed || 0,
+                        windDirection: sensorData.wind_dir_last || sensorData.wind_dir || 0,
+                        rainfall: sensorData.rainfall_last_15_min || sensorData.rain_rate || 0,
+                        uvIndex: sensorData.uv_index || 0,
+                        solar: sensorData.solar_rad || 0,
+                        battery: sensorData.battery_volt ? Math.min(100, Math.max(0, (sensorData.battery_volt / 12) * 100)) : 0,
+                        indoorTemp: sensorData.temp_in || sensorData.temp || 0,
+                        indoorHumidity: sensorData.hum_in || sensorData.hum || 0
+                    };
+                    
+                    weatherPerformanceStats.successfulCalls++;
+                    weatherPerformanceStats.avgResponseTime = Math.round((Date.now() - startTime + weatherPerformanceStats.avgResponseTime) / 2);
+                    weatherPerformanceStats.lastUpdate = new Date();
+                    
+                    // Success - update active mode and status
+                    activeWeatherMode = 'cloud';
+                    updateWeatherStatus('Connected - Cloud API', true);
+                    console.log('☁️ Cloud API data fetched successfully:', weatherData);
+                    return; // Exit early on success
+                } else {
+                    throw new Error('No sensor data received from Cloud API - check station ID');
+                }
+            } else {
+                const errorText = await currentResponse.text().catch(() => 'Unable to read error details');
+                throw new Error(`Cloud API returned ${currentResponse.status}: ${currentResponse.statusText} - ${errorText}`);
+            }
             
         } catch (error) {
             weatherPerformanceStats.failedCalls++;
