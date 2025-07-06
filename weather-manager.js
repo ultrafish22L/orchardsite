@@ -440,9 +440,11 @@ window.WeatherManager = (function() {
                 case 'cloud':
                     // Check credentials before attempting connection
                     if (!areCloudCredentialsConfigured()) {
-                        console.log('☁️ Cloud credentials not configured, falling back to demo mode');
+                        console.log('☁️ Cloud credentials not configured, switching to demo mode');
+                        currentWeatherMode = 'demo';
                         generateMockData();
                         updateWeatherStatus('Demo Mode - Cloud credentials not configured', true);
+                        updateFooterWeatherStatus();
                     } else {
                         await fetchCloudData();
                     }
