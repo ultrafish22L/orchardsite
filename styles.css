@@ -1648,6 +1648,22 @@ body::after {
         line-height: 1;
     }
     
+    .print-plant-name {
+        position: absolute;
+        top: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.95);
+        color: #2d8f64;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        white-space: nowrap;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        z-index: 4;
+    }
+    
     .map-title {
         display: none !important;
     }
