@@ -432,9 +432,15 @@ window.WeatherManager = (function() {
                     if (window.location.protocol === 'file:') {
                         console.log('☁️ Cloud weather not available in standalone mode, switching to demo mode');
                         currentWeatherMode = 'demo';
+                        activeWeatherMode = 'demo';
                         generateMockData();
                         updateWeatherStatus('Demo Mode - Cloud weather not available in standalone mode', true);
                         updateFooterWeatherStatus();
+                        // Reset polling interval to demo mode frequency
+                        if (weatherUpdateInterval) {
+                            clearInterval(weatherUpdateInterval);
+                        }
+                        startWeatherUpdates();
                         break;
                     }
                     
@@ -442,9 +448,15 @@ window.WeatherManager = (function() {
                     if (!areCloudCredentialsConfigured()) {
                         console.log('☁️ Cloud credentials not configured, switching to demo mode');
                         currentWeatherMode = 'demo';
+                        activeWeatherMode = 'demo';
                         generateMockData();
                         updateWeatherStatus('Demo Mode - Cloud credentials not configured', true);
                         updateFooterWeatherStatus();
+                        // Reset polling interval to demo mode frequency
+                        if (weatherUpdateInterval) {
+                            clearInterval(weatherUpdateInterval);
+                        }
+                        startWeatherUpdates();
                     } else {
                         await fetchCloudData();
                     }
@@ -455,9 +467,15 @@ window.WeatherManager = (function() {
                     if (window.location.protocol === 'file:') {
                         console.log('🏠 Local weather not available in standalone mode, switching to demo mode');
                         currentWeatherMode = 'demo';
+                        activeWeatherMode = 'demo';
                         generateMockData();
                         updateWeatherStatus('Demo Mode - Local weather not available in standalone mode', true);
                         updateFooterWeatherStatus();
+                        // Reset polling interval to demo mode frequency
+                        if (weatherUpdateInterval) {
+                            clearInterval(weatherUpdateInterval);
+                        }
+                        startWeatherUpdates();
                         break;
                     }
                     
@@ -486,9 +504,15 @@ window.WeatherManager = (function() {
                     if (window.location.protocol === 'file:') {
                         console.log('🔄 Auto mode not available in standalone mode, switching to demo mode');
                         currentWeatherMode = 'demo';
+                        activeWeatherMode = 'demo';
                         generateMockData();
                         updateWeatherStatus('Demo Mode - Auto mode not available in standalone mode', true);
                         updateFooterWeatherStatus();
+                        // Reset polling interval to demo mode frequency
+                        if (weatherUpdateInterval) {
+                            clearInterval(weatherUpdateInterval);
+                        }
+                        startWeatherUpdates();
                         break;
                     }
                     
