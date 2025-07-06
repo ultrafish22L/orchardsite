@@ -1551,5 +1551,17 @@ window.plantsDatabase = [
         cultivation_tips: "Thrives in tropical to subtropical climates with temperatures between 65-85°F (18-29°C). Requires well-draining soil and can tolerate drought once established. Needs support structure as it's a climbing cactus that can reach 20 feet. Full sun to partial shade. Benefits from regular watering during growing season but avoid waterlogging. Can be grown in large containers. Fruits typically develop 30-50 days after flowering.",
         pest_management: "Generally pest-resistant but monitor for scale insects, mealybugs, and aphids. Watch for fungal issues in humid conditions with poor air circulation. Protect from snails and slugs which can damage young growth. Avoid overwatering to prevent root rot. Strong winds can damage the climbing stems.",
         pruning_guidelines: "Regular pruning needed to manage size and shape on support structure. Remove dead, damaged, or diseased stems. Prune after fruiting season to encourage new growth. Can be trained along fences, trellises, or poles. Remove excess growth to improve air circulation and light penetration. Wear gloves when pruning due to small spines on stems."
+    },
+    {
+        name: "Rambutan",
+        botanical: "Nephelium lappaceum",
+        category: "fruit",
+        info_url: "https://en.wikipedia.org/wiki/Rambutan",
+        emoji: "🔴",
+        rare: true,
+        general_info: "Rambutan (*Nephelium lappaceum*) is a medium-sized tropical tree in the family Sapindaceae, native to Southeast Asia. The name refers to both the tree and its edible fruit, which is closely related to lychee, longan, and pulasan. The fruit is round to oval with leathery red skin covered in soft spines, containing translucent white flesh with a sweet, mildly acidic flavor reminiscent of grapes. Trees can reach 15-24 meters (49-79 feet) tall with dense dark green foliage.",
+        cultivation_tips: "Thrives in tropical climates with high humidity and consistent temperatures between 70-85°F (21-29°C). Requires well-draining, fertile soil with pH 5.5-6.5. Needs protection from strong winds and consistent moisture without waterlogging. Trees can be male, female, or hermaphroditic - hermaphroditic trees are preferred for fruit production. Grafted trees begin fruiting in 3-5 years versus 7-10 years for seedlings. Space trees 25-30 feet apart for optimal growth.",
+        pest_management: "Monitor for scale insects, fruit flies, and fungal diseases in humid conditions. Ensure good air circulation around the canopy to prevent disease. Watch for fruit borers during fruiting season. Young trees are more susceptible to pest damage than mature specimens. Regular inspection and prompt treatment of issues is important.",
+        pruning_guidelines: "Prune to develop strong scaffold branches and maintain manageable height for harvesting. Remove dead, diseased, or crossing branches. Light annual pruning helps maintain tree shape and improves air circulation. Avoid heavy pruning which can reduce fruit production. Best pruned during dry season to reduce disease risk."
     }
 ];
