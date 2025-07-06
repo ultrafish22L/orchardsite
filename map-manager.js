@@ -943,6 +943,30 @@ window.MapManager = (function() {
             `;
         });
         
+        // Get the map image and convert to data URL for reliable printing
+        const mapImg = mapContainer.querySelector('img');
+        let mapImageData = '';
+        
+        if (mapImg && mapImg.complete) {
+            try {
+                // Create a canvas to convert image to data URL
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = mapImg.naturalWidth || mapImg.width;
+                canvas.height = mapImg.naturalHeight || mapImg.height;
+                ctx.drawImage(mapImg, 0, 0);
+                mapImageData = canvas.toDataURL('image/png');
+                console.log('🖼️ Map image converted to data URL for printing');
+            } catch (e) {
+                console.warn('⚠️ Could not convert map image to data URL:', e);
+                mapImageData = mapImg.src;
+            }
+        } else {
+            // Fallback to original image path
+            mapImageData = 'giantslothorchard_map.png';
+            console.log('🖼️ Using original image path for printing');
+        }
+        
         // Create print window
         const printWindow = window.open('', '_blank', 'width=800,height=600');
         if (!printWindow) {
@@ -1006,17 +1030,15 @@ window.MapManager = (function() {
                         overflow: hidden;
                     }
                     
-                    .map-background {
+                    .map-image {
                         position: absolute;
                         top: 0;
                         left: 0;
                         width: 100%;
                         height: 100%;
-                        background-image: url('giantslothorchard_map.png');
-                        background-size: cover;
-                        background-position: center;
-                        background-repeat: no-repeat;
+                        object-fit: cover;
                         opacity: 0.8;
+                        z-index: 1;
                     }
                     
                     .map-overlay {
@@ -1026,6 +1048,7 @@ window.MapManager = (function() {
                         width: 100%;
                         height: 100%;
                         background: rgba(74, 124, 89, 0.3);
+                        z-index: 2;
                     }
                     
                     .print-plant {
@@ -1105,7 +1128,7 @@ window.MapManager = (function() {
                 <div class="print-page">
                     <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Page 1 of 2)</h2>
                     <div class="map-content page-1">
-                        <div class="map-background"></div>
+                        <img class="map-image" src="${mapImageData}" alt="Farm Map" onload="console.log('✅ Map image loaded in print window')" onerror="console.error('❌ Failed to load map image in print window')">
                         <div class="map-overlay"></div>
                         ${plantsHTML}
                         <div class="map-title">Giant Sloth Orchard<br><small>Holualoa, Hawaii Island</small></div>
@@ -1127,7 +1150,7 @@ window.MapManager = (function() {
                 <div class="print-page">
                     <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Page 2 of 2)</h2>
                     <div class="map-content page-2">
-                        <div class="map-background"></div>
+                        <img class="map-image" src="${mapImageData}" alt="Farm Map" onload="console.log('✅ Map image loaded in print window')" onerror="console.error('❌ Failed to load map image in print window')">
                         <div class="map-overlay"></div>
                         ${plantsHTML}
                         <div class="map-title">Giant Sloth Orchard<br><small>Holualoa, Hawaii Island</small></div>
@@ -1145,11 +1168,43 @@ window.MapManager = (function() {
                 <script>
                     console.log('🖨️ Map print window loaded with ${mapPlants.length} plants');
                     
-                    // Wait for any background images to load, then print
+                    // Wait for map images to load, then print
+                    let imagesLoaded = 0;
+                    const images = document.querySelectorAll('.map-image');
+                    const totalImages = images.length;
+                    
+                    function checkImagesLoaded() {
+                        imagesLoaded++;
+                        console.log('📸 Image loaded:', imagesLoaded, '/', totalImages);
+                        
+                        if (imagesLoaded >= totalImages) {
+                            console.log('🖨️ All images loaded, opening print dialog...');
+                            setTimeout(() => {
+                                window.print();
+                            }, 500);
+                        }
+                    }
+                    
+                    // Set up image load listeners
+                    images.forEach(img => {
+                        if (img.complete) {
+                            checkImagesLoaded();
+                        } else {
+                            img.onload = checkImagesLoaded;
+                            img.onerror = () => {
+                                console.warn('⚠️ Image failed to load, proceeding anyway');
+                                checkImagesLoaded();
+                            };
+                        }
+                    });
+                    
+                    // Fallback timeout in case images don't load
                     setTimeout(() => {
-                        console.log('🖨️ Opening print dialog...');
-                        window.print();
-                    }, 1500);
+                        if (imagesLoaded < totalImages) {
+                            console.log('⏰ Timeout reached, opening print dialog anyway...');
+                            window.print();
+                        }
+                    }, 3000);
                 </script>
             </body>
             </html>
