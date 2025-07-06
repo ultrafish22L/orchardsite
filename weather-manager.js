@@ -587,7 +587,20 @@ window.WeatherManager = (function() {
                         startWeatherUpdates();
                         break;
                     }
+
+                    // Check if we're in hosted environment (not localhost)
+                    const hostname = window.location.hostname;
+                    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+                        console.log('🔄 Auto mode in hosted environment - using demo mode for reliability');
+                        currentWeatherMode = 'demo';
+                        activeWeatherMode = 'demo';
+                        generateMockData();
+                        updateWeatherStatus('Demo Mode - Auto mode optimized for hosted environment', true);
+                        updateFooterWeatherStatus();
+                        break;
+                    }
                     
+                    // Only try cloud/local APIs in local development environment
                     try {
                         if (areCloudCredentialsConfigured()) {
                             await fetchCloudData();
