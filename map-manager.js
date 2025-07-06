@@ -929,6 +929,37 @@ window.MapManager = (function() {
         let leftPlantsList = [];
         let rightPlantsList = [];
         
+        // Function to determine best text position to avoid clipping and overlaps
+        function getSmartTextPosition(x, y, isLeftHalf) {
+            // Define boundaries (with margins for text)
+            const margin = 15; // Percentage margin from edges
+            const topBoundary = margin;
+            const bottomBoundary = 100 - margin;
+            const leftBoundary = margin;
+            const rightBoundary = 100 - margin;
+            
+            // Default to bottom position
+            let position = 'position-bottom';
+            
+            // Check if bottom position would be clipped
+            if (y > bottomBoundary - 10) {
+                position = 'position-top';
+            }
+            // Check if top position would be clipped
+            else if (y < topBoundary + 10) {
+                position = 'position-bottom';
+            }
+            // For plants near edges, use side positioning
+            else if (x < leftBoundary + 10) {
+                position = 'position-right';
+            }
+            else if (x > rightBoundary - 10) {
+                position = 'position-left';
+            }
+            
+            return position;
+        }
+
         mapPlants.forEach((plant, index) => {
             const rect = plant.getBoundingClientRect();
             const containerRect = mapContainer.getBoundingClientRect();
@@ -945,20 +976,24 @@ window.MapManager = (function() {
             if (relativeX <= 50) {
                 // Left half - adjust X position to be relative to left half (0-100%)
                 const adjustedX = (relativeX / 50) * 100;
+                const textPosition = getSmartTextPosition(adjustedX, relativeY, true);
+                
                 leftPlantsHTML += `
                     <div class="print-plant" style="left: ${adjustedX}%; top: ${relativeY}%;" title="${plantName}">
                         <div class="print-plant-emoji">${emoji}</div>
-                        <div class="print-plant-name">${plantName}</div>
+                        <div class="print-plant-name ${textPosition}">${plantName}</div>
                     </div>
                 `;
                 leftPlantsList.push({ emoji, plantName });
             } else {
                 // Right half - adjust X position to be relative to right half (0-100%)
                 const adjustedX = ((relativeX - 50) / 50) * 100;
+                const textPosition = getSmartTextPosition(adjustedX, relativeY, false);
+                
                 rightPlantsHTML += `
                     <div class="print-plant" style="left: ${adjustedX}%; top: ${relativeY}%;" title="${plantName}">
                         <div class="print-plant-emoji">${emoji}</div>
-                        <div class="print-plant-name">${plantName}</div>
+                        <div class="print-plant-name ${textPosition}">${plantName}</div>
                     </div>
                 `;
                 rightPlantsList.push({ emoji, plantName });
