@@ -123,18 +123,25 @@ window.MapManager = (function() {
         console.log('🖱️ Map clicked in mode:', mapMode, 'tempPlantData:', !!tempPlantData);
         
         if (mapMode === 'add') {
-            // In add mode, place plant at cursor position if none exists
-            if (!tempPlantData) {
-                console.log('🌱 Placing new temp plant...');
-                const rect = event.currentTarget.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-                console.log('📍 Placement coordinates:', { x, y });
-                placeTempPlantAtPosition(x, y);
+            // In add mode, place a new plant at cursor position on each click
+            console.log('🌱 Placing new plant...');
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            console.log('📍 Placement coordinates:', { x, y });
+            
+            // Check if we clicked on an existing plant first
+            const clickedPlant = findPlantAtPosition(x, y);
+            if (clickedPlant && clickedPlant.id !== 'temp') {
+                console.log('🖱️ Clicked existing plant in add mode, selecting for drag:', clickedPlant.name);
+                selectedPlant = clickedPlant.id;
                 event.preventDefault();
-            } else {
-                console.log('⚠️ Temp plant already exists, ignoring click');
+                return;
             }
+            
+            // Place new plant immediately as permanent
+            addPlantAtPosition(x, y);
+            event.preventDefault();
             return;
         }
 
@@ -191,12 +198,20 @@ window.MapManager = (function() {
 
     function handleMouseDown(event) {
         if (mapMode === 'add') {
-            // In add mode, only start dragging if clicking on the temp plant
-            if (tempPlantData) {
-                const rect = event.currentTarget.getBoundingClientRect();
-                const x = event.clientX - rect.left;
-                const y = event.clientY - rect.top;
-                
+            // In add mode, allow dragging any existing plant (including newly placed ones)
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const clickedPlant = findPlantAtPosition(x, y);
+            if (clickedPlant && clickedPlant.id !== 'temp') {
+                selectedPlant = clickedPlant.id;
+                isDragging = true;
+                event.preventDefault();
+                console.log('🖱️ Started dragging plant in add mode:', placedPlants[selectedPlant].name);
+            }
+            // Also check temp plant if it exists
+            else if (tempPlantData) {
                 const distance = Math.sqrt(
                     Math.pow(x - tempPlantData.x, 2) + Math.pow(y - tempPlantData.y, 2)
                 );
@@ -229,11 +244,18 @@ window.MapManager = (function() {
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         
-        if (mapMode === 'add' && tempPlantData) {
-            // Update temp plant position
-            tempPlantData.x = x;
-            tempPlantData.y = y;
-            renderMapPlants();
+        if (mapMode === 'add') {
+            if (selectedPlant && placedPlants[selectedPlant]) {
+                // Update existing plant position in add mode
+                placedPlants[selectedPlant].x = x;
+                placedPlants[selectedPlant].y = y;
+                renderMapPlants();
+            } else if (tempPlantData) {
+                // Update temp plant position
+                tempPlantData.x = x;
+                tempPlantData.y = y;
+                renderMapPlants();
+            }
         } else if (mapMode === 'edit' && selectedPlant && placedPlants[selectedPlant]) {
             // Update existing plant position
             placedPlants[selectedPlant].x = x;
@@ -243,7 +265,13 @@ window.MapManager = (function() {
     }
 
     function handleMouseUp(event) {
+        if (isDragging && mapMode === 'add' && selectedPlant) {
+            // Save changes when dragging in add mode
+            savePlantPlacements();
+            console.log('💾 Saved plant position after drag in add mode');
+        }
         isDragging = false;
+        selectedPlant = null;
     }
 
     function findPlantAtPosition(x, y) {
@@ -566,6 +594,46 @@ window.MapManager = (function() {
     function placePlantAtPosition(x, y) {
         // This function is now an alias for placeTempPlantAtPosition
         placeTempPlantAtPosition(x, y);
+    }
+
+    function addPlantAtPosition(x, y) {
+        console.log('🌱 addPlantAtPosition called:', { x, y, selectedPlantForAddition });
+        
+        if (!selectedPlantForAddition) {
+            console.log('❌ No plant selected for addition');
+            return;
+        }
+        
+        // Find the plant data
+        const plantData = window.plantsDatabase.find(p => p.name === selectedPlantForAddition);
+        if (!plantData) {
+            console.log('❌ Plant not found in database:', selectedPlantForAddition);
+            return;
+        }
+        
+        console.log('✅ Found plant data:', plantData.name);
+        
+        // Create plant data object
+        const radius = getPlantDiameter(plantData) / 2;
+        const emoji = getPlantEmoji(plantData);
+        
+        const newPlantData = {
+            x: x,
+            y: y,
+            radius: radius,
+            name: plantData.name,
+            emoji: emoji
+        };
+        
+        // Generate unique ID and add to permanent plants immediately
+        const plantId = 'plant_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        placedPlants[plantId] = newPlantData;
+        
+        console.log('✅ Plant added permanently:', plantId, newPlantData.name);
+        
+        // Save and render
+        savePlantPlacements();
+        renderMapPlants();
     }
 
     function getPlantDiameter(plantData) {
