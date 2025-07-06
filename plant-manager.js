@@ -214,13 +214,22 @@ window.PlantManager = (function() {
         if (plant.fruit_photo) imageUrls.push({ url: plant.fruit_photo, label: 'Fruit' });
         
         if (imageUrls.length > 0) {
-            images.innerHTML = imageUrls.map(img => `
-                <img src="${img.url}" alt="${plant.name} - ${img.label}" class="detail-image" 
-                     onclick="PlantManager.openPhotoModal('${img.url}')" 
-                     onerror="this.style.display='none';">
+            images.innerHTML = imageUrls.map((img, imgIndex) => `
+                <div class="detail-image-container">
+                    <img src="${img.url}" alt="${plant.name} - ${img.label}" class="detail-image" 
+                         onclick="PlantManager.openPhotoModal('${img.url}')" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="detail-image-fallback" style="display: none;">
+                        <div class="detail-emoji">${plant.emoji || '🌱'}</div>
+                        <div class="detail-emoji-label">${img.label}</div>
+                    </div>
+                </div>
             `).join('');
         } else {
-            images.innerHTML = `<div style="font-size: 6rem; text-align: center; padding: 2rem; display: flex; align-items: center; justify-content: center;">${plant.emoji || '🌱'}</div>`;
+            images.innerHTML = `<div class="detail-image-fallback detail-image-only">
+                <div class="detail-emoji">${plant.emoji || '🌱'}</div>
+                <div class="detail-emoji-label">Plant</div>
+            </div>`;
         }
         
         let textContent = `
