@@ -1047,25 +1047,23 @@ window.MapManager = (function() {
                         height: 60vh;
                     }
                     
-                    .map-background {
+                    .map-image {
                         position: absolute;
                         top: 0;
                         left: 0;
-                        width: 100%;
+                        width: 200%;
                         height: 100%;
-                        background-image: url('giantslothorchard_map.png');
-                        background-size: 200% 100%;
-                        background-repeat: no-repeat;
                         opacity: 0.8;
                         z-index: 1;
+                        object-fit: cover;
                     }
                     
-                    .map-background.left-half {
-                        background-position: 0% center;
+                    .map-image.left-half {
+                        left: 0%;
                     }
                     
-                    .map-background.right-half {
-                        background-position: 100% center;
+                    .map-image.right-half {
+                        left: -100%;
                     }
                     
                     .print-plant {
@@ -1180,6 +1178,12 @@ window.MapManager = (function() {
                         .print-page {
                             padding: 0;
                         }
+                        
+                        .map-image {
+                            -webkit-print-color-adjust: exact !important;
+                            color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
                     }
                 </style>
             </head>
@@ -1192,7 +1196,7 @@ window.MapManager = (function() {
                 <div class="print-page map-page">
                     <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Left Half - Page 1 of 2)</h2>
                     <div class="map-content">
-                        <div class="map-background left-half"></div>
+                        <img class="map-image left-half" src="giantslothorchard_map.png" alt="Farm Map - Left Half" onerror="this.style.display='none';">
                         ${leftPlantsHTML}
                         <div class="map-title">Giant Sloth Orchard<br><small>Holualoa, Hawaii Island</small></div>
                         <div class="map-subtitle">Left Half - Exotic Tropical Plants & Rare Fruits</div>
@@ -1206,7 +1210,7 @@ window.MapManager = (function() {
                 <div class="print-page map-page">
                     <h2 class="print-title">🦥 Giant Sloth Orchard - Farm Map (Right Half - Page 2 of 2)</h2>
                     <div class="map-content">
-                        <div class="map-background right-half"></div>
+                        <img class="map-image right-half" src="giantslothorchard_map.png" alt="Farm Map - Right Half" onerror="this.style.display='none';">
                         ${rightPlantsHTML}
                         <div class="map-title">Giant Sloth Orchard<br><small>Holualoa, Hawaii Island</small></div>
                         <div class="map-subtitle">Right Half - Visits by appointment only</div>
