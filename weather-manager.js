@@ -136,6 +136,15 @@ window.WeatherManager = (function() {
         const hasEnvCredentials = !!(envApiKey && envStationId && envApiSecret);
         const hasSettingsCredentials = !!(apiSettings.cloud.apiKey && apiSettings.cloud.stationId && apiSettings.cloud.apiSecret);
         
+        console.log('🔍 Cloud credentials check:', {
+            envApiKey: envApiKey ? '***' : null,
+            envStationId: envStationId ? '***' : null,
+            envApiSecret: envApiSecret ? '***' : null,
+            hasEnvCredentials,
+            hasSettingsCredentials,
+            result: hasEnvCredentials || hasSettingsCredentials
+        });
+        
         return hasEnvCredentials || hasSettingsCredentials;
     }
 
@@ -586,10 +595,11 @@ window.WeatherManager = (function() {
         lastAttemptedMode = null; // Reset attempt tracking
         updateWeatherStatus('Starting...', false, true);
         
-        // Live data updates
-        if (updateIntervals.live >= 1) {
-            liveUpdateTimer = setInterval(updateWeatherData, updateIntervals.live * 1000);
-            console.log(`📊 Weather updates every ${updateIntervals.live} seconds`);
+        // Live data updates - use longer intervals for demo mode
+        const updateInterval = currentWeatherMode === 'demo' ? Math.max(30, updateIntervals.live) : updateIntervals.live;
+        if (updateInterval >= 1) {
+            liveUpdateTimer = setInterval(updateWeatherData, updateInterval * 1000);
+            console.log(`📊 Weather updates every ${updateInterval} seconds`);
         }
         
         // Historical data storage
@@ -1090,6 +1100,11 @@ window.WeatherManager = (function() {
     async function loadEnvironmentConfig() {
         try {
             console.log('🔧 Loading environment configuration...');
+            // Skip environment config fetch in standalone mode
+            if (window.location.protocol === 'file:') {
+                console.log('📁 Standalone mode detected, skipping environment config fetch');
+                return;
+            }
             const response = await fetch('/api/config/env');
             
             if (!response.ok) {
