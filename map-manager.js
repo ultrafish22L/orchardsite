@@ -599,6 +599,9 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         hideElement('map-edit-btn');
         hideElement('map-delete-btn');
         hideElement('map-print-btn');
+        hideElement('map-download-btn');
+        hideElement('map-upload-btn');
+        hideElement('map-clear-btn');
         
         // Show only confirm/cancel controls
         showElement('map-edit-controls');
@@ -611,6 +614,9 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         showElement('map-edit-btn');
         showElement('map-delete-btn');
         showElement('map-print-btn');
+        showElement('map-download-btn');
+        showElement('map-upload-btn');
+        showElement('map-clear-btn');
         
         // Hide confirm/cancel controls
         hideElement('map-edit-controls');
