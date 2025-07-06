@@ -61,10 +61,10 @@ function generateApiSignature(apiKey, apiSecret, timestamp, parameters = {}) {
 // Enhanced WeatherLink v2 Cloud API proxy
 app.use('/api/cloud/*', async (req, res) => {
     try {
-        const apiPath = req.url.replace('/api/cloud/', '');
+        const apiPath = req.originalUrl.replace('/api/cloud/', '');
         const targetUrl = `https://api.weatherlink.com/v2/${apiPath}`;
         
-        console.log(`☁️ Proxying cloud API: ${req.method} ${targetUrl}`);
+        console.log(`☁️ Proxying cloud API: ${req.method} ${targetUrl} (original: ${req.originalUrl}, path: ${apiPath})`);
         
         // Extract API credentials from headers or query
         const apiKey = req.headers['x-api-key'] || req.query['api-key'];
@@ -81,20 +81,39 @@ app.use('/api/cloud/*', async (req, res) => {
         
         // Generate timestamp and signature
         const timestamp = Math.floor(Date.now() / 1000);
-        const signature = generateApiSignature(apiKey, apiSecret, timestamp, req.query);
+        
+        // Include path parameters in signature calculation
+        const allParams = { ...req.query };
+        if (apiPath.includes('/')) {
+            // For endpoints like current/209169, include station_id in params
+            const pathParts = apiPath.split('/');
+            if (pathParts[0] === 'current' && pathParts[1]) {
+                allParams['station-id'] = pathParts[1];
+            }
+        }
+        
+        const signature = generateApiSignature(apiKey, apiSecret, timestamp, allParams);
+        
+        // Add required query parameters
+        const queryParams = new URLSearchParams(req.query);
+        queryParams.set('api-key', apiKey);
+        queryParams.set('t', timestamp.toString());
+        queryParams.set('api-signature', signature);
         
         // Prepare headers
         const headers = {
             'Accept': 'application/json',
-            'User-Agent': 'Giant-Sloth-Weather-Station/2.0',
-            'X-Api-Key': apiKey,
-            'X-Timestamp': timestamp.toString(),
-            'X-Api-Signature': signature
+            'User-Agent': 'Giant-Sloth-Weather-Station/2.0'
         };
+        
+        console.log(`☁️ API Key: ${apiKey.substring(0, 8)}...`);
+        console.log(`☁️ Timestamp: ${timestamp}`);
+        console.log(`☁️ Signature: ${signature.substring(0, 16)}...`);
         
         const https = require('https');
         const url = require('url');
-        const parsedUrl = url.parse(targetUrl + (req.url.includes('?') ? '' : '?') + new URLSearchParams(req.query));
+        const fullUrl = targetUrl + (targetUrl.includes('?') ? '&' : '?') + queryParams.toString();
+        const parsedUrl = url.parse(fullUrl);
         
         const options = {
             hostname: parsedUrl.hostname,
@@ -560,6 +579,46 @@ app.get('/api/health', (req, res) => {
     };
     
     res.json(health);
+});
+
+// Test endpoints
+app.get('/api/test/cloud', async (req, res) => {
+    try {
+        const response = await fetch('http://localhost:50783/api/cloud/stations', {
+            headers: {
+                'X-Api-Key': 'u6boo3oegcazrzdz74hw3m3rrszdarbf',
+                'X-Api-Secret': 'ivp7huetdpkjdlfwp9mtty7kinpln28i'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            res.json({ 
+                status: 'success', 
+                message: 'Cloud API connection successful',
+                station_count: data.stations?.length || 0,
+                first_station: data.stations?.[0]?.station_name || 'Unknown'
+            });
+        } else {
+            res.status(response.status).json({ 
+                status: 'error', 
+                message: `Cloud API returned ${response.status}` 
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ 
+            status: 'error', 
+            message: error.message 
+        });
+    }
+});
+
+app.get('/api/test/local', (req, res) => {
+    res.json({ 
+        status: 'info', 
+        message: 'Local API test requires device IP configuration',
+        note: 'Configure device IP in weather settings to test local connection'
+    });
 });
 
 // Serve the weather station app on root
