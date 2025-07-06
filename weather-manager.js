@@ -68,6 +68,94 @@ window.WeatherManager = (function() {
 
     // Weather settings
     let widgetSettings = {};
+    
+    // Environment detection
+    let deploymentMode = null; // 'standalone', 'local-server', 'hosted'
+    let availableModes = ['demo']; // Will be populated based on deployment
+    
+    // Detect deployment environment and available weather modes
+    function detectDeploymentEnvironment() {
+        const protocol = window.location.protocol;
+        const hostname = window.location.hostname;
+        
+        if (protocol === 'file:') {
+            deploymentMode = 'standalone';
+            availableModes = ['demo'];
+            console.log('🔍 Environment: Standalone mode (file://) - Only demo weather available');
+        } else if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            deploymentMode = 'local-server';
+            availableModes = ['demo', 'cloud', 'local', 'auto'];
+            console.log('🔍 Environment: Local server mode - All weather modes available');
+        } else {
+            deploymentMode = 'hosted';
+            availableModes = ['demo', 'cloud', 'local', 'auto'];
+            console.log('🔍 Environment: Hosted mode - All weather modes available');
+        }
+        
+        return deploymentMode;
+    }
+    
+    // Check if a weather mode is available in current environment
+    function isModeAvailable(mode) {
+        return availableModes.includes(mode);
+    }
+    
+    // Get the best available mode for current environment
+    function getBestAvailableMode(requestedMode) {
+        if (isModeAvailable(requestedMode)) {
+            return requestedMode;
+        }
+        
+        // Fallback logic based on environment
+        if (deploymentMode === 'standalone') {
+            console.log(`⚠️ ${requestedMode} mode not available in standalone mode, using demo mode`);
+            return 'demo';
+        }
+        
+        // For server modes, return the requested mode (let it try and fail properly)
+        return requestedMode;
+    }
+    
+    // Update the mode dropdown to show available modes
+    function updateModeDropdown() {
+        const dropdown = document.getElementById('mode-dropdown');
+        if (!dropdown) return;
+        
+        // Clear existing items
+        dropdown.innerHTML = '';
+        
+        // Add available modes
+        const modes = [
+            { key: 'demo', label: 'Demo Mode', description: 'Mock weather data' },
+            { key: 'cloud', label: 'Cloud API', description: 'WeatherLink Cloud' },
+            { key: 'local', label: 'Local API', description: 'Local WeatherLink device' },
+            { key: 'auto', label: 'Auto Mode', description: 'Smart fallback' }
+        ];
+        
+        modes.forEach(mode => {
+            const item = document.createElement('div');
+            item.className = 'dropdown-item';
+            item.setAttribute('data-mode', mode.key);
+            
+            const available = isModeAvailable(mode.key);
+            if (!available) {
+                item.classList.add('disabled');
+                item.title = `Not available in ${deploymentMode} mode`;
+            }
+            
+            item.innerHTML = `
+                <span class="mode-label">${mode.label}</span>
+                <span class="mode-description">${mode.description}</span>
+                ${!available ? '<span class="mode-unavailable">⚠️</span>' : ''}
+            `;
+            
+            if (available) {
+                item.addEventListener('click', () => switchWeatherMode(mode.key));
+            }
+            
+            dropdown.appendChild(item);
+        });
+    }
 
     function loadWeatherSettings() {
         try {
@@ -428,16 +516,10 @@ window.WeatherManager = (function() {
                     break;
                     
                 case 'cloud':
-                    if (window.location.protocol === 'file:') {
-                        throw new Error('Cloud API not available in standalone mode. Please use server mode or switch to demo mode.');
-                    }
                     await fetchCloudData();
                     break;
                     
                 case 'local':
-                    if (window.location.protocol === 'file:') {
-                        throw new Error('Local API not available in standalone mode. Please use server mode or switch to demo mode.');
-                    }
                     await fetchLocalData();
                     break;
                     
@@ -1044,7 +1126,13 @@ window.WeatherManager = (function() {
         
         console.log('🔄 switchWeatherMode called:', mode);
         
-        currentWeatherMode = mode;
+        // Check environment and get best available mode
+        const bestMode = getBestAvailableMode(mode);
+        if (bestMode !== mode) {
+            console.log(`🔄 Mode ${mode} adjusted to ${bestMode} for current environment`);
+        }
+        
+        currentWeatherMode = bestMode;
         const modeBtn = document.getElementById('mode-btn');
         if (modeBtn) {
             modeBtn.textContent = `${mode.charAt(0).toUpperCase() + mode.slice(1)} Mode`;
@@ -1126,6 +1214,12 @@ window.WeatherManager = (function() {
 
     function initializeWeather() {
         console.log('🌦️ Initializing weather system...');
+        
+        // Detect deployment environment first
+        detectDeploymentEnvironment();
+        
+        // Update UI to show available modes
+        updateModeDropdown();
         
         // Load environment config first, then settings
         loadEnvironmentConfig().then(() => {
@@ -1348,6 +1442,11 @@ window.WeatherManager = (function() {
         
         // Utility functions
         generateMockData: generateMockData,
-        storeHistoricalData: storeHistoricalData
+        storeHistoricalData: storeHistoricalData,
+        
+        // Environment info
+        getDeploymentMode: () => deploymentMode,
+        getAvailableModes: () => availableModes,
+        isModeAvailable: isModeAvailable
     };
 })(); 
