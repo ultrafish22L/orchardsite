@@ -129,9 +129,9 @@ window.WeatherManager = (function() {
     // Check if API credentials are configured
     function areCloudCredentialsConfigured() {
         // Check environment variables first (for server-side), then fall back to settings
-        const envApiKey = typeof process !== 'undefined' && process.env ? process.env.WEATHERLINK_API_KEY : null;
-        const envStationId = typeof process !== 'undefined' && process.env ? process.env.WEATHERLINK_STATION_ID : null;
-        const envApiSecret = typeof process !== 'undefined' && process.env ? process.env.WEATHERLINK_API_SECRET : null;
+        const envApiKey = typeof process !== 'undefined' && process.env ? process.env.SLOTH_WEATHERLINK_KEY : null;
+        const envStationId = typeof process !== 'undefined' && process.env ? process.env.SLOTH_WEATHERLINK_STATION_ID : null;
+        const envApiSecret = typeof process !== 'undefined' && process.env ? process.env.SLOTH_WEATHERLINK_SECRET : null;
         
         const hasEnvCredentials = !!(envApiKey && envStationId && envApiSecret);
         const hasSettingsCredentials = !!(apiSettings.cloud.apiKey && apiSettings.cloud.stationId && apiSettings.cloud.apiSecret);
@@ -168,8 +168,8 @@ window.WeatherManager = (function() {
             
             try {
                 // Use environment variables if available, otherwise fall back to settings
-                const apiKey = (typeof process !== 'undefined' && process.env?.WEATHERLINK_API_KEY) || apiSettings.cloud.apiKey;
-                const apiSecret = (typeof process !== 'undefined' && process.env?.WEATHERLINK_API_SECRET) || apiSettings.cloud.apiSecret;
+                const apiKey = (typeof process !== 'undefined' && process.env?.SLOTH_WEATHERLINK_KEY) || apiSettings.cloud.apiKey;
+                const apiSecret = (typeof process !== 'undefined' && process.env?.SLOTH_WEATHERLINK_SECRET) || apiSettings.cloud.apiSecret;
                 
                 const stationsResponse = await fetch('/api/cloud/stations', {
                     headers: {
