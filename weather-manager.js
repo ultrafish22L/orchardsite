@@ -128,7 +128,15 @@ window.WeatherManager = (function() {
 
     // Check if API credentials are configured
     function areCloudCredentialsConfigured() {
-        return !!(apiSettings.cloud.apiKey && apiSettings.cloud.stationId && apiSettings.cloud.apiSecret);
+        // Check environment variables first (for server-side), then fall back to settings
+        const envApiKey = typeof process !== 'undefined' && process.env ? process.env.WEATHERLINK_API_KEY : null;
+        const envStationId = typeof process !== 'undefined' && process.env ? process.env.WEATHERLINK_STATION_ID : null;
+        const envApiSecret = typeof process !== 'undefined' && process.env ? process.env.WEATHERLINK_API_SECRET : null;
+        
+        const hasEnvCredentials = !!(envApiKey && envStationId && envApiSecret);
+        const hasSettingsCredentials = !!(apiSettings.cloud.apiKey && apiSettings.cloud.stationId && apiSettings.cloud.apiSecret);
+        
+        return hasEnvCredentials || hasSettingsCredentials;
     }
 
     function areLocalCredentialsConfigured() {
@@ -159,10 +167,14 @@ window.WeatherManager = (function() {
             let station = null;
             
             try {
+                // Use environment variables if available, otherwise fall back to settings
+                const apiKey = (typeof process !== 'undefined' && process.env?.WEATHERLINK_API_KEY) || apiSettings.cloud.apiKey;
+                const apiSecret = (typeof process !== 'undefined' && process.env?.WEATHERLINK_API_SECRET) || apiSettings.cloud.apiSecret;
+                
                 const stationsResponse = await fetch('/api/cloud/stations', {
                     headers: {
-                        'X-Api-Key': apiSettings.cloud.apiKey,
-                        'X-Api-Secret': apiSettings.cloud.apiSecret
+                        'X-Api-Key': apiKey,
+                        'X-Api-Secret': apiSecret
                     }
                 });
                 
@@ -267,12 +279,16 @@ window.WeatherManager = (function() {
                     mode: 'no-cors'
                 }).catch((noCorseError) => {
                     console.log('🔄 Direct calls failed, checking for proxy server...');
-                    // If both fail, try proxy server if available
-                    return fetch(`/api/weather/current_conditions?ip=${apiSettings.local.ip}&port=${apiSettings.local.port}&https=${apiSettings.local.https}`, {
-                        method: 'GET',
-                        headers: headers,
-                        mode: 'cors'
-                    });
+                    // If both fail, try proxy server if available (only if not running standalone)
+                    if (window.location.protocol !== 'file:') {
+                        return fetch(`/api/weather/current_conditions?ip=${apiSettings.local.ip}&port=${apiSettings.local.port}&https=${apiSettings.local.https}`, {
+                            method: 'GET',
+                            headers: headers,
+                            mode: 'cors'
+                        });
+                    } else {
+                        throw new Error('Local device not accessible and no proxy server available in standalone mode');
+                    }
                 });
             });
 
@@ -424,9 +440,12 @@ window.WeatherManager = (function() {
                 case 'cloud':
                     // Check credentials before attempting connection
                     if (!areCloudCredentialsConfigured()) {
-                        throw new Error('Cloud API credentials not configured. Please configure API Key, Station ID, and API Secret in weather settings.');
+                        console.log('☁️ Cloud credentials not configured, falling back to demo mode');
+                        generateMockData();
+                        updateWeatherStatus('Demo Mode - Cloud credentials not configured', true);
+                    } else {
+                        await fetchCloudData();
                     }
-                    await fetchCloudData();
                     break;
                     
                 case 'local':
