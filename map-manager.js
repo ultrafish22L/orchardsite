@@ -11,6 +11,7 @@ window.MapManager = (function() {
     let selectedPlantForAddition = '';
     let tempPlantData = null; // Holds the temp plant data without adding to placedPlants
     let tempDeleteList = {}; // Holds plants marked for deletion
+    let plantsAddedInCurrentSession = []; // Track plants added during current add session
     let originalPositions = {}; // Backup of plant positions before editing
     let mapInitialized = false;
     let isDragging = false;
@@ -319,7 +320,9 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             selectedPlant: selectedPlant,
             tempPlantData: !!tempPlantData,
             placedPlantsCount: Object.keys(placedPlants).length,
-            placedPlantsKeys: Object.keys(placedPlants).join(', ')
+            placedPlantsKeys: Object.keys(placedPlants).join(', '),
+            tempDeleteListCount: Object.keys(tempDeleteList).length,
+            tempDeleteListKeys: Object.keys(tempDeleteList).join(', ')
         };
         window.debugLog && window.debugLog('🔍 Current state: ' + JSON.stringify(state), 'info');
         return state;
@@ -388,20 +391,24 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         }
         
         if (mapMode === 'delete') {
+            console.log('🗑️ Delete mode click handling - clickedPlant:', clickedPlant);
             if (clickedPlant && clickedPlant.id !== 'temp') {
-                // If clicking on already selected plant, do nothing
-                if (selectedPlant === clickedPlant.id) {
-                    console.log('🖱️ Clicked already selected plant in delete mode - ignoring');
-                    event.preventDefault();
-                    return;
+                console.log('🗑️ Processing plant for deletion toggle:', clickedPlant.id);
+                // Toggle plant deletion status
+                if (tempDeleteList[clickedPlant.id]) {
+                    // Plant is already marked for deletion - unmark it
+                    delete tempDeleteList[clickedPlant.id];
+                    console.log('✅ Unmarked plant for deletion:', clickedPlant.name);
+                } else {
+                    // Mark plant for deletion
+                    tempDeleteList[clickedPlant.id] = placedPlants[clickedPlant.id];
+                    console.log('🗑️ Marked plant for deletion:', clickedPlant.name);
                 }
-                // First click selects the plant
-                console.log('🎯 Selecting plant for deletion:', clickedPlant.name);
-                selectPlant(clickedPlant.id);
+                console.log('🗑️ Current tempDeleteList:', Object.keys(tempDeleteList));
+                renderMapPlants();
                 event.preventDefault();
             } else {
-                console.log('🕳️ Empty area clicked - deselecting');
-                deselectPlant();
+                console.log('🕳️ Empty area clicked in delete mode');
             }
             return;
         }
@@ -650,6 +657,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         selectedPlantForAddition = dropdown.value;
         mapMode = 'add';
         tempPlantData = null; // Reset temp plant data
+        plantsAddedInCurrentSession = []; // Reset session tracking
         isDragging = false; // Reset dragging state
         
         console.log('✅ Entering add mode:', { selectedPlantForAddition, mapMode });
@@ -802,9 +810,27 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
 
     function cancelAddPlant() {
         console.log('❌ Canceling add mode');
+        
+        // Remove all plants added during this session
+        if (plantsAddedInCurrentSession.length > 0) {
+            console.log('🗑️ Removing plants added in this session:', plantsAddedInCurrentSession.length);
+            plantsAddedInCurrentSession.forEach(plantId => {
+                if (placedPlants[plantId]) {
+                    const plantName = placedPlants[plantId].name;
+                    delete placedPlants[plantId];
+                    console.log('🗑️ Removed plant:', plantName, plantId);
+                }
+            });
+            
+            // Save after removing plants
+            savePlantPlacements();
+        }
+        
+        // Reset state
         mapMode = 'normal';
         selectedPlantForAddition = '';
         tempPlantData = null; // Reset temp plant data
+        plantsAddedInCurrentSession = []; // Clear session tracking
 
         // Show all buttons, hide confirm/cancel
         showAllButtons();
@@ -866,6 +892,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         mapMode = 'normal';
         selectedPlantForAddition = '';
         tempPlantData = null; // Clear any temp data
+        plantsAddedInCurrentSession = []; // Clear session tracking (plants are now confirmed)
 
         // Show all buttons, hide confirm/cancel
         showAllButtons();
@@ -924,7 +951,11 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         const plantId = 'plant_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         placedPlants[plantId] = newPlantData;
         
+        // Track this plant for potential cancellation
+        plantsAddedInCurrentSession.push(plantId);
+        
         console.log('✅ Plant added permanently:', plantId, newPlantData.name);
+        console.log('📝 Session plants:', plantsAddedInCurrentSession.length);
         
         // Save and render
         savePlantPlacements();
@@ -1071,14 +1102,9 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
     }
 
     function confirmDeletePlants() {
-        // Delete the currently selected plant if any
-        if (selectedPlant && placedPlants[selectedPlant]) {
-            const plantName = placedPlants[selectedPlant].name;
-            delete placedPlants[selectedPlant];
-            console.log('🗑️ Plant permanently deleted:', plantName);
-        }
+        console.log('🗑️ Confirming deletion of', Object.keys(tempDeleteList).length, 'plants');
         
-        // Also delete any plants in temp delete list (for backward compatibility)
+        // Delete all plants in temp delete list
         Object.keys(tempDeleteList).forEach(plantId => {
             if (placedPlants[plantId]) {
                 const plantName = placedPlants[plantId].name;
@@ -1116,6 +1142,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         
         // Clear temp delete list (plants return to normal)
         tempDeleteList = {};
+        selectedPlant = null; // Clear selection
         
         // Return to normal mode
         mapMode = 'normal';
