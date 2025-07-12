@@ -244,3 +244,151 @@ window.AppManager = (function() {
         hideElement: hideElement
     };
 })();
+
+// Debug Console Functions
+window.debugLog = function(message, type = 'info') {
+    const output = document.getElementById('debug-output');
+    if (!output) return;
+    
+    const timestamp = new Date().toLocaleTimeString();
+    const colors = {
+        info: '#00ff00',
+        warn: '#ffff00', 
+        error: '#ff0000',
+        success: '#00ffff'
+    };
+    
+    const logEntry = document.createElement('div');
+    logEntry.style.color = colors[type] || colors.info;
+    logEntry.style.marginBottom = '2px';
+    logEntry.style.fontSize = '11px';
+    logEntry.style.lineHeight = '1.2';
+    logEntry.textContent = `[${timestamp}] ${message}`;
+    
+    output.appendChild(logEntry);
+    
+    // Auto-scroll to bottom
+    setTimeout(() => {
+        output.scrollTop = output.scrollHeight;
+    }, 10);
+    
+    // Keep only last 100 messages to prevent memory issues
+    while (output.children.length > 100) {
+        output.removeChild(output.firstChild);
+    }
+};
+
+window.toggleDebugPanel = function() {
+    const panel = document.getElementById('debug-panel');
+    const toggle = document.getElementById('debug-toggle');
+    
+    if (panel.style.display === 'none' || !panel.style.display) {
+        panel.style.display = 'block';
+        toggle.style.display = 'none';
+        debugLog('🐛 Debug panel opened', 'success');
+    } else {
+        panel.style.display = 'none';
+        toggle.style.display = 'block';
+    }
+};
+
+window.clearDebugOutput = function() {
+    const output = document.getElementById('debug-output');
+    if (output) {
+        output.innerHTML = '';
+        debugLog('Debug console cleared', 'info');
+    }
+};
+
+window.testSelectPlant = function() {
+    debugLog('🧪 Testing selectPlant function...', 'info');
+    
+    // Get the first placed plant
+    const placedPlants = JSON.parse(localStorage.getItem('mapPlants') || '{}');
+    const plantIds = Object.keys(placedPlants);
+    
+    if (plantIds.length === 0) {
+        debugLog('❌ No plants found on map', 'error');
+        return;
+    }
+    
+    const plantId = plantIds[0];
+    debugLog(`🌱 Testing with plant ID: ${plantId}`, 'info');
+    debugLog(`🌱 Plant data: ${JSON.stringify(placedPlants[plantId])}`, 'info');
+    
+    // Test selectPlant function
+    if (window.MapManager && window.MapManager.selectPlant) {
+        window.MapManager.selectPlant(plantId);
+        debugLog('✅ selectPlant function called', 'success');
+    } else {
+        debugLog('❌ MapManager.selectPlant not found', 'error');
+    }
+};
+
+window.testDiameterSync = function() {
+    debugLog('🧪 Testing diameter synchronization...', 'info');
+    
+    const mainInput = document.getElementById('map-diameter-input');
+    const dropdown = document.getElementById('map-plant-dropdown');
+    
+    if (!mainInput) {
+        debugLog('❌ Main diameter input not found', 'error');
+        return;
+    }
+    
+    if (!dropdown) {
+        debugLog('❌ Plant dropdown not found', 'error');
+        return;
+    }
+    
+    debugLog(`📏 Current diameter input value: ${mainInput.value}`, 'info');
+    debugLog(`🌱 Current dropdown value: ${dropdown.value}`, 'info');
+    
+    // Test updating diameter input
+    const testValue = 15;
+    mainInput.value = testValue;
+    debugLog(`📏 Set diameter input to: ${testValue}`, 'success');
+};
+
+window.showPlantData = function() {
+    debugLog('📊 Showing plant data...', 'info');
+    
+    const placedPlants = JSON.parse(localStorage.getItem('mapPlants') || '{}');
+    debugLog(`🗺️ Placed plants count: ${Object.keys(placedPlants).length}`, 'info');
+    
+    Object.entries(placedPlants).forEach(([id, plant]) => {
+        debugLog(`🌱 ${id}: ${plant.name} (diameter: ${plant.diameter || 'default'})`, 'info');
+    });
+    
+    const mainInput = document.getElementById('map-diameter-input');
+    const dropdown = document.getElementById('map-plant-dropdown');
+    
+    if (mainInput) {
+        debugLog(`📏 Main diameter input: ${mainInput.value}`, 'info');
+    }
+    
+    if (dropdown) {
+        debugLog(`🌱 Selected plant: ${dropdown.value}`, 'info');
+    }
+};
+
+// Override console.log to capture debug messages
+const originalConsoleLog = console.log;
+console.log = function(...args) {
+    originalConsoleLog.apply(console, args);
+    
+    // Only capture messages with debug emojis
+    const message = args.join(' ');
+    if (message.includes('🔧') || message.includes('🐛') || message.includes('🌱') || message.includes('📏')) {
+        debugLog(message, 'info');
+    }
+};
+
+// Add keyboard shortcut for debug panel (Ctrl+Shift+D or Cmd+Shift+D)
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
+        e.preventDefault();
+        toggleDebugPanel();
+    }
+});
+

@@ -34,15 +34,22 @@ window.MapManager = (function() {
         // Set up the map container
         const mapContainer = document.getElementById('mapContainer');
         if (mapContainer) {
+            console.log('🔧 Adding click listener to mapContainer:', mapContainer.id);
             mapContainer.addEventListener('click', handleMapClick);
             mapContainer.addEventListener('mousedown', handleMouseDown);
             mapContainer.addEventListener('mousemove', handleMouseMove);
             mapContainer.addEventListener('mouseup', handleMouseUp);
             mapContainer.addEventListener('mouseleave', handleMouseUp);
+            console.log('✅ All map event listeners added');
+        } else {
+            console.log('❌ mapContainer not found!');
         }
         
         // Populate plant dropdown
         populatePlantDropdown();
+        
+        // Setup diameter input handlers
+        setupDiameterInputHandlers();
         
         // Render existing plants
         renderMapPlants();
@@ -227,80 +234,199 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         const appleBanana = availablePlants.find(plant => plant.name === 'Apple Banana');
         if (appleBanana) {
             dropdown.value = 'Apple Banana';
+            updateDiameterInputFromPlant('Apple Banana');
             console.log('🍌 Plant dropdown defaulted to Apple Banana');
         }
     }
 
+    function setupDiameterInputHandlers() {
+        const diameterInput = document.getElementById('map-diameter-input');
+        const editDiameterInput = document.getElementById('map-edit-diameter-input');
+        
+        if (diameterInput) {
+            // Prevent the input from triggering map clicks
+            diameterInput.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            diameterInput.addEventListener('keydown', function(e) {
+                e.stopPropagation();
+            });
+            
+            console.log('✅ Diameter input handlers setup');
+        }
+        
+        if (editDiameterInput) {
+            // Prevent the input from triggering map clicks
+            editDiameterInput.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            editDiameterInput.addEventListener('keydown', function(e) {
+                e.stopPropagation();
+            });
+            
+            console.log('✅ Edit diameter input handlers setup');
+        }
+    }
+
+    function updateDiameterInputFromPlant(plantName) {
+        const diameterInput = document.getElementById('map-diameter-input');
+        if (!diameterInput || !window.plantsDatabase) return;
+
+        const plantData = window.plantsDatabase.find(p => p.name === plantName);
+        if (plantData) {
+            const diameter = getPlantDiameter(plantData);
+            diameterInput.value = diameter;
+            console.log('📏 Updated diameter input to:', diameter, 'feet for', plantName);
+        }
+    }
+
+    function getCurrentDiameter() {
+        const diameterInput = document.getElementById('map-diameter-input');
+        if (diameterInput && diameterInput.value) {
+            const value = parseFloat(diameterInput.value);
+            if (!isNaN(value) && value > 0) {
+                return value;
+            }
+        }
+        
+        // Fallback to plant database diameter
+        if (selectedPlantForAddition && window.plantsDatabase) {
+            const plantData = window.plantsDatabase.find(p => p.name === selectedPlantForAddition);
+            if (plantData) {
+                return getPlantDiameter(plantData);
+            }
+        }
+        
+        return mapConfig.defaultPlantSize;
+    }
+
+    // Debug function to reset mode
+    window.resetMapMode = function() {
+        window.debugLog && window.debugLog('🔄 Resetting map mode to normal', 'info');
+        mapMode = 'normal';
+        tempPlantData = null;
+        showAllButtons();
+        hideConfirmCancelButtons();
+        window.debugLog && window.debugLog('✅ Map mode reset to: ' + mapMode, 'success');
+    };
+    
+    // Debug function to check current state
+    window.debugState = function() {
+        const state = {
+            mapMode: mapMode,
+            selectedPlant: selectedPlant,
+            tempPlantData: !!tempPlantData,
+            placedPlantsCount: Object.keys(placedPlants).length,
+            placedPlantsKeys: Object.keys(placedPlants).join(', ')
+        };
+        window.debugLog && window.debugLog('🔍 Current state: ' + JSON.stringify(state), 'info');
+        return state;
+    };
+
     function handleMapClick(event) {
         console.log('🖱️ Map clicked in mode:', mapMode, 'tempPlantData:', !!tempPlantData);
+        console.log('🖱️ Event target:', event.target.className, 'Current target:', event.currentTarget.id);
+        // Add a simple test to see if this function is being called
+        window.debugLog && window.debugLog('🖱️ handleMapClick called! Mode: ' + mapMode, 'info');
+        
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const clickedPlant = findPlantAtPosition(x, y);
+        
+        console.log('🔍 Debug click:', {
+            selectedPlant,
+            clickedPlantId: clickedPlant?.id,
+            clickedPlantName: clickedPlant?.name,
+            isEqual: selectedPlant === clickedPlant?.id,
+            coordinates: { x, y }
+        });
         
         if (mapMode === 'add') {
-            // In add mode, place a new plant at cursor position on each click
-            console.log('🌱 Placing new plant...');
-            const rect = event.currentTarget.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            console.log('📍 Placement coordinates:', { x, y });
-            
             // Check if we clicked on an existing plant first
-            const clickedPlant = findPlantAtPosition(x, y);
             if (clickedPlant && clickedPlant.id !== 'temp') {
-                console.log('🖱️ Clicked existing plant in add mode, selecting for drag:', clickedPlant.name);
-                selectedPlant = clickedPlant.id;
+                // If clicking on already selected plant, do nothing
+                if (selectedPlant === clickedPlant.id) {
+                    console.log('🖱️ Clicked already selected plant in add mode - ignoring');
+                    event.preventDefault();
+                    return;
+                }
+                // First click selects the plant
+                console.log('🎯 Selecting plant in add mode:', clickedPlant.name);
+                selectPlant(clickedPlant.id);
                 event.preventDefault();
                 return;
             }
             
             // Place new plant immediately as permanent
+            console.log('🌱 Placing new plant...');
+            console.log('📍 Placement coordinates:', { x, y });
             addPlantAtPosition(x, y);
             event.preventDefault();
             return;
         }
 
         if (mapMode === 'edit') {
-            // In edit mode, clicking selects plants for dragging
-            const rect = event.currentTarget.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            const clickedPlant = findPlantAtPosition(x, y);
-            
             if (clickedPlant && clickedPlant.id !== 'temp') {
-                console.log('✏️ Plant selected for editing:', clickedPlant.name);
-                selectedPlant = clickedPlant.id;
+                // If clicking on already selected plant, do nothing
+                if (selectedPlant === clickedPlant.id) {
+                    console.log('🖱️ Clicked already selected plant in edit mode - ignoring');
+                    event.preventDefault();
+                    return;
+                }
+                // First click selects the plant
+                console.log('🎯 Selecting plant for editing:', clickedPlant.name);
+                selectPlant(clickedPlant.id);
                 event.preventDefault();
             } else {
                 console.log('🕳️ Empty area clicked - deselecting');
-                selectedPlant = null;
+                deselectPlant();
             }
             return;
         }
         
         if (mapMode === 'delete') {
-            // In delete mode, mark plants for deletion
-            const rect = event.currentTarget.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-            const clickedPlant = findPlantAtPosition(x, y);
-            
             if (clickedPlant && clickedPlant.id !== 'temp') {
-                console.log('🗑️ Plant marked for deletion:', clickedPlant.name);
-                markPlantForDeletion(clickedPlant.id);
+                // If clicking on already selected plant, do nothing
+                if (selectedPlant === clickedPlant.id) {
+                    console.log('🖱️ Clicked already selected plant in delete mode - ignoring');
+                    event.preventDefault();
+                    return;
+                }
+                // First click selects the plant
+                console.log('🎯 Selecting plant for deletion:', clickedPlant.name);
+                selectPlant(clickedPlant.id);
                 event.preventDefault();
+            } else {
+                console.log('🕳️ Empty area clicked - deselecting');
+                deselectPlant();
             }
             return;
         }
         
         // In normal mode, clicking on a plant shows its detail
         console.log('👁️ Normal mode click - checking for plants');
-        const rect = event.currentTarget.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const clickedPlant = findPlantAtPosition(x, y);
         
         if (clickedPlant) {
-            console.log('🌿 Plant clicked:', clickedPlant.name);
-            // Show plant detail immediately in normal mode
-            showPlantDetailFromMap(clickedPlant);
+            console.log('🔍 Normal mode plant click comparison:', {
+                selectedPlant,
+                clickedPlantId: clickedPlant.id,
+                areEqual: selectedPlant === clickedPlant.id,
+                selectedPlantType: typeof selectedPlant,
+                clickedPlantIdType: typeof clickedPlant.id
+            });
+            
+            // If clicking on already selected plant, show detail modal
+            if (selectedPlant === clickedPlant.id) {
+                console.log('🌿 Showing detail for selected plant:', clickedPlant.name);
+                showPlantDetailFromMap(clickedPlant);
+            } else {
+                // First click selects the plant
+                console.log('🎯 Selecting plant in normal mode:', clickedPlant.name);
+                selectPlant(clickedPlant.id);
+            }
         } else {
             console.log('🕳️ Empty area clicked - deselecting');
             // Clicked empty area: deselect
@@ -418,6 +544,42 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             dropdown.value = placedPlants[plantId].name;
         }
         
+        // Update main diameter input to match selected plant
+        const mainDiameterInput = document.getElementById('map-diameter-input');
+        if (mainDiameterInput && placedPlants[plantId]) {
+            const plant = placedPlants[plantId];
+            const plantData = window.plantsDatabase?.find(p => p.name === plant.name) || {};
+            const diameter = plant.diameter || getPlantDiameter(plantData);
+            console.log('🔧 selectPlant updating main diameter:', {
+                plantId,
+                plantName: plant.name,
+                storedDiameter: plant.diameter,
+                defaultDiameter: getPlantDiameter(plantData),
+                finalDiameter: diameter,
+                currentInputValue: mainDiameterInput.value
+            });
+            mainDiameterInput.value = diameter;
+            console.log('🔧 After update, input value:', mainDiameterInput.value);
+        }
+        
+        // If in edit mode, populate the edit controls
+        if (mapMode === 'edit' && placedPlants[plantId]) {
+            const plant = placedPlants[plantId];
+            const editNameSpan = document.getElementById('map-edit-plant-name');
+            const editDiameterInput = document.getElementById('map-edit-diameter-input');
+            
+            if (editNameSpan) {
+                editNameSpan.textContent = plant.name;
+            }
+            
+            if (editDiameterInput) {
+                // Use stored diameter or get from database
+                const plantData = window.plantsDatabase?.find(p => p.name === plant.name) || {};
+                const diameter = plant.diameter || getPlantDiameter(plantData);
+                editDiameterInput.value = diameter;
+            }
+        }
+
         renderMapPlants();
         console.log('🎯 Selected plant:', plantId);
     }
@@ -569,6 +731,20 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
 
     function confirmEditMode() {
         console.log('✅ Confirming edit mode');
+        
+        // Save diameter changes if a plant is selected
+        if (selectedPlant && placedPlants[selectedPlant]) {
+            const editDiameterInput = document.getElementById('map-edit-diameter-input');
+            if (editDiameterInput && editDiameterInput.value) {
+                const newDiameter = parseFloat(editDiameterInput.value);
+                if (!isNaN(newDiameter) && newDiameter > 0) {
+                    placedPlants[selectedPlant].diameter = newDiameter;
+                    placedPlants[selectedPlant].radius = calculatePlantRadius(newDiameter);
+                    console.log('📏 Updated plant diameter to:', newDiameter, 'feet');
+                }
+            }
+        }
+        
         mapMode = 'normal';
         selectedPlant = null;
         tempPlantData = null;
@@ -594,6 +770,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
 
     function hideAllButtonsExceptConfirmCancel() {
         // Hide all primary buttons
+        hideElement('map-diameter-input');
         hideElement('map-plant-select');
         hideElement('map-add-btn');
         hideElement('map-edit-btn');
@@ -609,6 +786,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
 
     function showAllButtons() {
         // Show all primary buttons
+        showElement('map-diameter-input');
         showElement('map-plant-select');
         showElement('map-add-btn');
         showElement('map-edit-btn');
@@ -658,8 +836,8 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         
         console.log('✅ Found plant data:', plantData.name);
         
-        // Get plant size (diameter in feet)
-        const diameter = getPlantDiameter(plantData);
+        // Get plant size (diameter in feet) - use custom diameter if provided
+        const diameter = getCurrentDiameter();
         const height = getPlantHeight(plantData);
         const radius = calculatePlantRadius(diameter);
         console.log('📏 Plant dimensions:', { diameter, height, radius });
@@ -726,8 +904,8 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         
         console.log('✅ Found plant data:', plantData.name);
         
-        // Create plant data object
-        const diameter = getPlantDiameter(plantData);
+        // Create plant data object - use custom diameter if provided
+        const diameter = getCurrentDiameter();
         const height = getPlantHeight(plantData);
         const radius = calculatePlantRadius(diameter);
         const emoji = getPlantEmoji(plantData);
@@ -893,17 +1071,27 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
     }
 
     function confirmDeletePlants() {
-        console.log('✅ Confirming deletion of', Object.keys(tempDeleteList).length, 'plants');
-        
-        // Actually remove plants from placedPlants
-        Object.keys(tempDeleteList).forEach(plantId => {
-            const plantName = placedPlants[plantId]?.name;
-            delete placedPlants[plantId];
+        // Delete the currently selected plant if any
+        if (selectedPlant && placedPlants[selectedPlant]) {
+            const plantName = placedPlants[selectedPlant].name;
+            delete placedPlants[selectedPlant];
             console.log('🗑️ Plant permanently deleted:', plantName);
+        }
+        
+        // Also delete any plants in temp delete list (for backward compatibility)
+        Object.keys(tempDeleteList).forEach(plantId => {
+            if (placedPlants[plantId]) {
+                const plantName = placedPlants[plantId].name;
+                delete placedPlants[plantId];
+                console.log('🗑️ Plant permanently deleted:', plantName);
+            }
         });
         
-        // Clear temp delete list
+        console.log('✅ Confirming deletion completed');
+        
+        // Clear temp delete list and selection
         tempDeleteList = {};
+        selectedPlant = null;
         
         // Return to normal mode
         mapMode = 'normal';
@@ -976,7 +1164,8 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             // Get plant data from database for styling
             const plantData = window.plantsDatabase?.find(p => p.name === plant.name) || {};
             const height = getPlantHeight(plantData);
-            const diameter = getPlantDiameter(plantData);
+            // Use stored diameter if available, otherwise get from database
+            const diameter = plant.diameter || getPlantDiameter(plantData);
             const baseColor = getPlantBaseColor(plantData);
             const radius = calculatePlantRadius(diameter);
             const opacity = calculatePlantOpacity(height);
@@ -1077,6 +1266,9 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             deselectPlant();
             return;
         }
+
+        // Update diameter input when plant selection changes
+        updateDiameterInputFromPlant(selectedPlantName);
         
         // If in normal mode and a plant is already selected, keep the current selection
         // This prevents the dropdown from interfering with map selections
