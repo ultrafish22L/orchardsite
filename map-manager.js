@@ -406,7 +406,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             return;
         }
         
-        // In normal mode, clicking on a plant shows its detail
+        // In normal mode, first click selects, subsequent clicks show detail
         console.log('👁️ Normal mode click - checking for plants');
         
         if (clickedPlant) {
