@@ -35,12 +35,14 @@ window.MapManager = (function() {
         // Set up the map container
         const mapContainer = document.getElementById('mapContainer');
         if (mapContainer) {
-            console.log('🔧 Adding click listener to mapContainer:', mapContainer.id);
+            console.log('🔧 Setting up NEW map click handler v3.0');
+            window.debugLog && window.debugLog('🔧 Setting up NEW map click handler v3.0', 'info');
+            
+            // Store reference to the new function
+            window.currentMapClickHandler = handleMapClick;
+            
+            // Add the new event listener
             mapContainer.addEventListener('click', handleMapClick);
-            mapContainer.addEventListener('mousedown', handleMouseDown);
-            mapContainer.addEventListener('mousemove', handleMouseMove);
-            mapContainer.addEventListener('mouseup', handleMouseUp);
-            mapContainer.addEventListener('mouseleave', handleMouseUp);
             console.log('✅ All map event listeners added');
         } else {
             console.log('❌ mapContainer not found!');
@@ -329,25 +331,19 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
     };
 
     function handleMapClick(event) {
-        console.log('🖱️ Map clicked in mode:', mapMode, 'tempPlantData:', !!tempPlantData);
-        console.log('🖱️ Event target:', event.target.className, 'Current target:', event.currentTarget.id);
-        // Add a simple test to see if this function is being called
-        window.debugLog && window.debugLog('🖱️ handleMapClick called! Mode: ' + mapMode, 'info');
+        window.debugLog && window.debugLog('🚀 NEW handleMapClick v3.0 called! Mode: ' + mapMode, 'success');
+        window.debugLog && window.debugLog('🖱️ Map clicked in mode: ' + mapMode + ', tempPlantData: ' + !!tempPlantData, 'info');
+        window.debugLog && window.debugLog('🖱️ Event target: ' + event.target.className + ', Current target: ' + event.currentTarget.id, 'info');
         
         const rect = event.currentTarget.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         const clickedPlant = findPlantAtPosition(x, y);
         
-        console.log('🔍 Debug click:', {
-            selectedPlant,
-            clickedPlantId: clickedPlant?.id,
-            clickedPlantName: clickedPlant?.name,
-            isEqual: selectedPlant === clickedPlant?.id,
-            coordinates: { x, y }
-        });
+        window.debugLog && window.debugLog('🔍 Debug click - selectedPlant: ' + selectedPlant + ', clickedPlantId: ' + (clickedPlant?.id || 'none') + ', clickedPlantName: ' + (clickedPlant?.name || 'none') + ', isEqual: ' + (selectedPlant === clickedPlant?.id) + ', coordinates: ' + x + ',' + y, 'info');
         
         if (mapMode === 'add') {
+            window.debugLog && window.debugLog('🌱 ADD MODE SECTION ENTERED', 'info');
             // Check if we clicked on an existing plant first
             if (clickedPlant && clickedPlant.id !== 'temp') {
                 // If clicking on already selected plant, do nothing
@@ -372,6 +368,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         }
 
         if (mapMode === 'edit') {
+            console.log('✏️ EDIT MODE SECTION ENTERED');
             if (clickedPlant && clickedPlant.id !== 'temp') {
                 // If clicking on already selected plant, do nothing
                 if (selectedPlant === clickedPlant.id) {
@@ -391,6 +388,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         }
         
         if (mapMode === 'delete') {
+            console.log('🗑️ DELETE MODE SECTION ENTERED');
             console.log('🗑️ Delete mode click handling - clickedPlant:', clickedPlant);
             if (clickedPlant && clickedPlant.id !== 'temp') {
                 console.log('🗑️ Processing plant for deletion toggle:', clickedPlant.id);
@@ -414,28 +412,23 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         }
         
         // In normal mode, first click selects, subsequent clicks show detail
-        console.log('👁️ Normal mode click - checking for plants');
+        window.debugLog && window.debugLog('👁️ NORMAL MODE SECTION ENTERED', 'info');
+        window.debugLog && window.debugLog('👁️ Normal mode click - checking for plants', 'info');
         
         if (clickedPlant) {
-            console.log('🔍 Normal mode plant click comparison:', {
-                selectedPlant,
-                clickedPlantId: clickedPlant.id,
-                areEqual: selectedPlant === clickedPlant.id,
-                selectedPlantType: typeof selectedPlant,
-                clickedPlantIdType: typeof clickedPlant.id
-            });
+            window.debugLog && window.debugLog('🔍 Normal mode plant click - selectedPlant: ' + selectedPlant + ', clickedPlantId: ' + clickedPlant.id + ', areEqual: ' + (selectedPlant === clickedPlant.id), 'info');
             
             // If clicking on already selected plant, show detail modal
             if (selectedPlant === clickedPlant.id) {
-                console.log('🌿 Showing detail for selected plant:', clickedPlant.name);
+                window.debugLog && window.debugLog('🌿 Showing detail for selected plant: ' + clickedPlant.name, 'success');
                 showPlantDetailFromMap(clickedPlant);
             } else {
                 // First click selects the plant
-                console.log('🎯 Selecting plant in normal mode:', clickedPlant.name);
+                window.debugLog && window.debugLog('🎯 Selecting plant in normal mode: ' + clickedPlant.name, 'info');
                 selectPlant(clickedPlant.id);
             }
         } else {
-            console.log('🕳️ Empty area clicked - deselecting');
+            window.debugLog && window.debugLog('🕳️ Empty area clicked - deselecting', 'info');
             // Clicked empty area: deselect
             deselectPlant();
         }
@@ -543,7 +536,10 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
     }
 
     function selectPlant(plantId) {
+        console.log('🎯 selectPlant called with plantId:', plantId);
+        console.log('🎯 Before setting: selectedPlant =', selectedPlant);
         selectedPlant = plantId;
+        console.log('🎯 After setting: selectedPlant =', selectedPlant);
         
         // Update dropdown to match selected plant
         const dropdown = document.getElementById('map-plant-select');
@@ -592,6 +588,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
     }
 
     function deselectPlant() {
+        console.log('❌ deselectPlant called - clearing selectedPlant');
         selectedPlant = null;
         
         // Clear dropdown selection
