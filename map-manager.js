@@ -41,8 +41,12 @@ window.MapManager = (function() {
             // Store reference to the new function
             window.currentMapClickHandler = handleMapClick;
             
-            // Add the new event listener
-            mapContainer.addEventListener('click', handleMapClick);
+            // Add the new event listeners
+            mapContainer.addEventListener('click', handleEditModeClick);
+            
+            // Add document-level event listeners for edit mode dragging
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
             console.log('✅ All map event listeners added');
         } else {
             console.log('❌ mapContainer not found!');
@@ -330,6 +334,69 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         return state;
     };
 
+    // NEW SIMPLIFIED FUNCTION FOR EDIT MODE ONLY
+    function handleEditModeClick(event) {
+        window.debugLog && window.debugLog('🚀 SIMPLE handleEditModeClick called! Mode: ' + mapMode, 'success');
+        
+        const rect = event.currentTarget.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const clickedPlant = findPlantAtPosition(x, y);
+        
+        window.debugLog && window.debugLog('🖱️ Clicked plant: ' + (clickedPlant ? clickedPlant.name : 'none'), 'info');
+        
+        if (mapMode === 'edit') {
+            window.debugLog && window.debugLog('✏️ EDIT MODE DETECTED', 'success');
+            if (clickedPlant && clickedPlant.id !== 'temp') {
+                window.debugLog && window.debugLog('🖱️ Plant clicked in edit mode - starting drag', 'info');
+                selectedPlant = clickedPlant.id;
+                isDragging = true;
+                event.preventDefault();
+                window.debugLog && window.debugLog('🖱️ Started dragging plant: ' + placedPlants[selectedPlant].name, 'success');
+                return;
+            } else {
+                window.debugLog && window.debugLog('🕳️ Empty area clicked - deselecting', 'info');
+                deselectPlant();
+            }
+            return;
+        }
+        
+        window.debugLog && window.debugLog('🤷 Mode not edit: ' + mapMode, 'warn');
+    }
+
+    // Mouse move handler for dragging
+    function handleMouseMove(event) {
+        if (!isDragging || !selectedPlant || mapMode !== 'edit') return;
+        
+        const rect = mapContainer.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        
+        // Update plant position
+        if (placedPlants[selectedPlant]) {
+            placedPlants[selectedPlant].x = x;
+            placedPlants[selectedPlant].y = y;
+            
+            // Re-render the plant at new position
+            renderMapPlants();
+            
+            window.debugLog && window.debugLog('🖱️ Dragging plant to: ' + x + ', ' + y, 'info');
+        }
+    }
+
+    // Mouse up handler to stop dragging
+    function handleMouseUp(event) {
+        if (isDragging && selectedPlant && mapMode === 'edit') {
+            window.debugLog && window.debugLog('🖱️ Stopped dragging plant: ' + placedPlants[selectedPlant].name, 'success');
+            
+            // Save the new position
+            saveMapData();
+            
+            isDragging = false;
+            event.preventDefault();
+        }
+    }
+
     function handleMapClick(event) {
         window.debugLog && window.debugLog('🚀 NEW handleMapClick v3.0 called! Mode: ' + mapMode, 'success');
         window.debugLog && window.debugLog('🖱️ Map clicked in mode: ' + mapMode + ', tempPlantData: ' + !!tempPlantData, 'info');
@@ -340,8 +407,18 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         const y = event.clientY - rect.top;
         const clickedPlant = findPlantAtPosition(x, y);
         
-        window.debugLog && window.debugLog('🔍 Debug click - selectedPlant: ' + selectedPlant + ', clickedPlantId: ' + (clickedPlant?.id || 'none') + ', clickedPlantName: ' + (clickedPlant?.name || 'none') + ', isEqual: ' + (selectedPlant === clickedPlant?.id) + ', coordinates: ' + x + ',' + y, 'info');
+        console.log('🔍 Debug click - selectedPlant:', selectedPlant, ', clickedPlantId:', (clickedPlant?.id || 'none'), ', clickedPlantName:', (clickedPlant?.name || 'none'), ', isEqual:', (selectedPlant === clickedPlant?.id), ', coordinates:', x, ',', y);
         
+        console.log('🔍 Line 348 reached');
+        
+        console.log('🔍 About to check mode - mapMode:', mapMode);
+        console.log('🔍 mapMode === "add":', mapMode === 'add');
+        console.log('🔍 mapMode === "edit":', mapMode === 'edit');
+        console.log('🔍 Mode check results - add:', (mapMode === 'add'), 'edit:', (mapMode === 'edit'));
+        window.debugLog && window.debugLog('🔍 AFTER MODE CHECK - about to continue', 'info');
+        
+        // TEMPORARILY COMMENTED OUT ADD MODE SECTION FOR DEBUGGING
+        /*
         if (mapMode === 'add') {
             window.debugLog && window.debugLog('🌱 ADD MODE SECTION ENTERED', 'info');
             // Check if we clicked on an existing plant first
@@ -366,20 +443,20 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             event.preventDefault();
             return;
         }
+        */
 
+        console.log('🔍 Skipped add mode section, about to check edit mode');
+        console.log('🔍 About to check edit mode - mapMode:', mapMode, 'selectedPlant:', selectedPlant);
         if (mapMode === 'edit') {
             console.log('✏️ EDIT MODE SECTION ENTERED');
             if (clickedPlant && clickedPlant.id !== 'temp') {
-                // If clicking on already selected plant, do nothing
-                if (selectedPlant === clickedPlant.id) {
-                    console.log('🖱️ Clicked already selected plant in edit mode - ignoring');
-                    event.preventDefault();
-                    return;
-                }
-                // First click selects the plant
-                console.log('🎯 Selecting plant for editing:', clickedPlant.name);
-                selectPlant(clickedPlant.id);
+                // In edit mode, start dragging immediately on plant click
+                console.log('🖱️ Plant clicked in edit mode - starting drag');
+                selectedPlant = clickedPlant.id;
+                isDragging = true;
                 event.preventDefault();
+                console.log('🖱️ Started dragging plant:', placedPlants[selectedPlant].name);
+                return;
             } else {
                 console.log('🕳️ Empty area clicked - deselecting');
                 deselectPlant();
@@ -435,6 +512,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
     }
 
     function handleMouseDown(event) {
+        console.log('🖱️ handleMouseDown called! Mode:', mapMode);
         if (mapMode === 'add') {
             // In add mode, allow dragging any existing plant (including newly placed ones)
             const rect = event.currentTarget.getBoundingClientRect();
@@ -460,11 +538,13 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             }
         } else if (mapMode === 'edit') {
             // In edit mode, find any plant at click position and start dragging immediately
+            console.log('🖱️ handleMouseDown called in edit mode');
             const rect = event.currentTarget.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
             
             const clickedPlant = findPlantAtPosition(x, y);
+            console.log('🖱️ handleMouseDown found plant:', clickedPlant);
             if (clickedPlant && clickedPlant.id !== 'temp') {
                 selectedPlant = clickedPlant.id;
                 isDragging = true;
@@ -583,7 +663,10 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             }
         }
 
-        renderMapPlants();
+        // Don't re-render immediately in edit mode to avoid DOM detachment during drag
+        if (mapMode !== 'edit') {
+            renderMapPlants();
+        }
         console.log('🎯 Selected plant:', plantId);
     }
 
@@ -1727,6 +1810,12 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         getSelectedPlant: () => selectedPlant,
         getPlacedPlants: () => placedPlants,
         getTempPlantData: () => tempPlantData,
+        
+        // Drag functionality (for testing)
+        handleMouseMove: handleMouseMove,
+        handleMouseUp: handleMouseUp,
+        isDragging: () => isDragging,
+        selectedPlant: selectedPlant,
         
         // Setup functions
         setupMapEventListeners: setupMapEventListeners,

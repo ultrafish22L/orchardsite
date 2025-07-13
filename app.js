@@ -304,24 +304,95 @@ window.testSelectPlant = function() {
     debugLog('🧪 Testing selectPlant function...', 'info');
     
     // Get the first placed plant
-    const placedPlants = JSON.parse(localStorage.getItem('mapPlants') || '{}');
-    const plantIds = Object.keys(placedPlants);
+    const savedData = localStorage.getItem('giantSlothOrchard_plantMap');
+    const placedPlantsArray = savedData ? JSON.parse(savedData) : [];
     
-    if (plantIds.length === 0) {
+    if (placedPlantsArray.length === 0) {
         debugLog('❌ No plants found on map', 'error');
         return;
     }
     
-    const plantId = plantIds[0];
-    debugLog(`🌱 Testing with plant ID: ${plantId}`, 'info');
-    debugLog(`🌱 Plant data: ${JSON.stringify(placedPlants[plantId])}`, 'info');
+    const plantData = placedPlantsArray[0];
+    debugLog(`🌱 Testing with first plant: ${plantData.name}`, 'info');
+    debugLog(`🌱 Plant data: ${JSON.stringify(plantData)}`, 'info');
     
-    // Test selectPlant function
-    if (window.MapManager && window.MapManager.selectPlant) {
-        window.MapManager.selectPlant(plantId);
-        debugLog('✅ selectPlant function called', 'success');
+    // Test selectPlant function - need to find actual plant ID from current map state
+    if (window.debugState) {
+        const state = window.debugState();
+        const plantKeys = state.placedPlantsKeys.split(', ').filter(key => key.trim());
+        if (plantKeys.length > 0) {
+            const plantId = plantKeys[0];
+            debugLog(`🎯 Using plant ID from current state: ${plantId}`, 'info');
+            if (window.MapManager && window.MapManager.selectPlant) {
+                window.MapManager.selectPlant(plantId);
+                debugLog('✅ selectPlant function called', 'success');
+            } else {
+                debugLog('❌ MapManager.selectPlant not found', 'error');
+            }
+        } else {
+            debugLog('❌ No plant IDs found in current state', 'error');
+        }
     } else {
-        debugLog('❌ MapManager.selectPlant not found', 'error');
+        debugLog('❌ debugState function not found', 'error');
+    }
+};
+
+window.testDragPlant = function() {
+    debugLog('🧪 Testing drag functionality...', 'info');
+    
+    // Get the first placed plant from current state
+    if (!window.debugState) {
+        debugLog('❌ debugState function not found', 'error');
+        return;
+    }
+    
+    const state = window.debugState();
+    const plantKeys = state.placedPlantsKeys.split(', ').filter(key => key.trim());
+    
+    if (plantKeys.length === 0) {
+        debugLog('❌ No plants found on map', 'error');
+        return;
+    }
+
+    const plantId = plantKeys[0];
+    debugLog(`🌱 Testing drag with plant ID: ${plantId}`, 'info');
+    
+    // Simulate drag sequence
+    debugLog('🖱️ Step 1: Simulating plant click to start drag...', 'info');
+    
+    // Set up drag state manually
+    if (window.MapManager) {
+        window.MapManager.selectedPlant = plantId;
+        window.MapManager.isDragging = true;
+        debugLog('✅ Drag state set: selectedPlant=' + plantId + ', isDragging=true', 'success');
+        
+        // Simulate mouse move to new position
+        const newX = plant.x + 50;
+        const newY = plant.y + 50;
+        debugLog(`🖱️ Step 2: Simulating mouse move to (${newX}, ${newY})...`, 'info');
+        
+        // Create a fake mouse event
+        const mapContainer = document.getElementById('map-container');
+        if (mapContainer) {
+            const rect = mapContainer.getBoundingClientRect();
+            const fakeEvent = {
+                clientX: rect.left + newX,
+                clientY: rect.top + newY
+            };
+            
+            // Call the mouse move handler directly
+            if (window.MapManager.handleMouseMove) {
+                window.MapManager.handleMouseMove(fakeEvent);
+                debugLog('✅ Mouse move handler called', 'success');
+            }
+            
+            // Simulate mouse up
+            debugLog('🖱️ Step 3: Simulating mouse up to end drag...', 'info');
+            if (window.MapManager.handleMouseUp) {
+                window.MapManager.handleMouseUp(fakeEvent);
+                debugLog('✅ Mouse up handler called', 'success');
+            }
+        }
     }
 };
 
@@ -350,25 +421,57 @@ window.testDiameterSync = function() {
     debugLog(`📏 Set diameter input to: ${testValue}`, 'success');
 };
 
-window.showPlantData = function() {
-    debugLog('📊 Showing plant data...', 'info');
+window.showPlantDataFixed = function() {
+    debugLog('📊 FIXED FUNCTION 20250713052730 - Showing plant data...', 'info');
+    debugLog('🔍 FIXED FUNCTION 20250713052730 - Checking localStorage...', 'info');
     
-    const placedPlants = JSON.parse(localStorage.getItem('mapPlants') || '{}');
-    debugLog(`🗺️ Placed plants count: ${Object.keys(placedPlants).length}`, 'info');
+    const correctKey = localStorage.getItem('giantSlothOrchard_plantMap');
+    debugLog('✅ FIXED FUNCTION - Correct key: ' + correctKey, 'info');
     
-    Object.entries(placedPlants).forEach(([id, plant]) => {
-        debugLog(`🌱 ${id}: ${plant.name} (diameter: ${plant.diameter || 'default'})`, 'info');
-    });
+    const wrongKey = localStorage.getItem('mapPlants');
+    debugLog('❌ FIXED FUNCTION - Wrong key: ' + wrongKey, 'info');
+    
+    if (correctKey) {
+        const placedPlantsArray = JSON.parse(correctKey);
+        debugLog('🗺️ FIXED FUNCTION - Placed plants count: ' + placedPlantsArray.length, 'info');
+    } else {
+        debugLog('❌ FIXED FUNCTION - No data found in giantSlothOrchard_plantMap', 'error');
+    }
     
     const mainInput = document.getElementById('map-diameter-input');
     const dropdown = document.getElementById('map-plant-dropdown');
     
     if (mainInput) {
-        debugLog(`📏 Main diameter input: ${mainInput.value}`, 'info');
+        debugLog('📏 FIXED FUNCTION - Main diameter input: ' + mainInput.value, 'info');
     }
     
     if (dropdown) {
-        debugLog(`🌱 Selected plant: ${dropdown.value}`, 'info');
+        debugLog('🌱 FIXED FUNCTION - Selected plant: ' + dropdown.value, 'info');
+    }
+};
+
+// Keep the old function but redirect it to the new one
+window.showPlantData = function() {
+    debugLog('🔄 REDIRECTING to fixed function...', 'info');
+    window.showPlantDataFixed();
+};
+
+// Add a completely new function for testing
+window.testNewFunction = function() {
+    debugLog('🚀 TEST NEW FUNCTION 20250713052900 - This is working!', 'info');
+    debugLog('🔍 TEST - Checking localStorage keys...', 'info');
+    
+    const correctKey = localStorage.getItem('giantSlothOrchard_plantMap');
+    debugLog('✅ TEST - Correct key data: ' + correctKey, 'info');
+    
+    const wrongKey = localStorage.getItem('mapPlants');
+    debugLog('❌ TEST - Wrong key data: ' + wrongKey, 'info');
+    
+    if (correctKey) {
+        const placedPlantsArray = JSON.parse(correctKey);
+        debugLog('🗺️ TEST - Placed plants count: ' + placedPlantsArray.length, 'info');
+    } else {
+        debugLog('❌ TEST - No data found in giantSlothOrchard_plantMap', 'error');
     }
 };
 
