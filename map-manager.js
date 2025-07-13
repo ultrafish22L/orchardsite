@@ -249,7 +249,6 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
 
     function setupDiameterInputHandlers() {
         const diameterInput = document.getElementById('map-diameter-input');
-        const editDiameterInput = document.getElementById('map-edit-diameter-input');
         
         if (diameterInput) {
             // Prevent the input from triggering map clicks
@@ -261,32 +260,21 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
                 e.stopPropagation();
             });
 
-            // Handle diameter changes in edit mode
+            // Handle diameter changes
             diameterInput.addEventListener('change', function(e) {
-                if (mapMode === 'edit' && selectedPlant && placedPlants[selectedPlant]) {
+                if (selectedPlant && placedPlants[selectedPlant]) {
                     const newDiameter = parseFloat(e.target.value);
                     if (!isNaN(newDiameter) && newDiameter > 0) {
                         placedPlants[selectedPlant].diameter = newDiameter;
+                        placedPlants[selectedPlant].radius = calculatePlantRadius(newDiameter);
                         console.log('📏 Updated plant diameter:', selectedPlant, 'to', newDiameter);
                         renderMapPlants();
+                        saveMapData();
                     }
                 }
             });
             
             console.log('✅ Diameter input handlers setup');
-        }
-        
-        if (editDiameterInput) {
-            // Prevent the input from triggering map clicks
-            editDiameterInput.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-            
-            editDiameterInput.addEventListener('keydown', function(e) {
-                e.stopPropagation();
-            });
-            
-            console.log('✅ Edit diameter input handlers setup');
         }
     }
 
@@ -463,12 +451,18 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         if (mapMode === 'edit') {
             console.log('✏️ EDIT MODE SECTION ENTERED');
             if (clickedPlant && clickedPlant.id !== 'temp') {
-                // In edit mode, start dragging immediately on plant click
-                console.log('🖱️ Plant clicked in edit mode - starting drag');
-                selectedPlant = clickedPlant.id;
-                isDragging = true;
+                // If clicking on already selected plant, start dragging
+                if (selectedPlant === clickedPlant.id) {
+                    console.log('🖱️ Plant clicked in edit mode - starting drag');
+                    isDragging = true;
+                    event.preventDefault();
+                    console.log('🖱️ Started dragging plant:', placedPlants[selectedPlant].name);
+                    return;
+                }
+                // First click selects the plant for editing
+                console.log('🎯 Selecting plant for editing:', clickedPlant.name);
+                selectPlant(clickedPlant.id);
                 event.preventDefault();
-                console.log('🖱️ Started dragging plant:', placedPlants[selectedPlant].name);
                 return;
             } else {
                 console.log('🕳️ Empty area clicked - deselecting');
@@ -662,23 +656,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             console.log('🔧 After update, input value:', mainDiameterInput.value);
         }
         
-        // If in edit mode, populate the edit controls
-        if (mapMode === 'edit' && placedPlants[plantId]) {
-            const plant = placedPlants[plantId];
-            const editNameSpan = document.getElementById('map-edit-plant-name');
-            const editDiameterInput = document.getElementById('map-edit-diameter-input');
-            
-            if (editNameSpan) {
-                editNameSpan.textContent = plant.name;
-            }
-            
-            if (editDiameterInput) {
-                // Use stored diameter or get from database
-                const plantData = window.plantsDatabase?.find(p => p.name === plant.name) || {};
-                const diameter = plant.diameter || getPlantDiameter(plantData);
-                editDiameterInput.value = diameter;
-            }
-        }
+
 
         // Don't re-render immediately in edit mode to avoid DOM detachment during drag
         if (mapMode !== 'edit') {
@@ -840,18 +818,7 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
     function confirmEditMode() {
         console.log('✅ Confirming edit mode');
         
-        // Save diameter changes if a plant is selected
-        if (selectedPlant && placedPlants[selectedPlant]) {
-            const editDiameterInput = document.getElementById('map-edit-diameter-input');
-            if (editDiameterInput && editDiameterInput.value) {
-                const newDiameter = parseFloat(editDiameterInput.value);
-                if (!isNaN(newDiameter) && newDiameter > 0) {
-                    placedPlants[selectedPlant].diameter = newDiameter;
-                    placedPlants[selectedPlant].radius = calculatePlantRadius(newDiameter);
-                    console.log('📏 Updated plant diameter to:', newDiameter, 'feet');
-                }
-            }
-        }
+
         
         mapMode = 'normal';
         selectedPlant = null;
