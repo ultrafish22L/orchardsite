@@ -989,7 +989,7 @@ body::after {
 
 /* ===== DIAMETER INPUT STYLING ===== */
 .diameter-input {
-    width: 120px !important;
+    width: 70px !important;
     text-align: center;
     font-weight: var(--font-weight-medium);
     background: rgba(255, 255, 255, 0.08) !important;

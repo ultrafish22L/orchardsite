@@ -15,6 +15,7 @@ window.MapManager = (function() {
     let originalPositions = {}; // Backup of plant positions before editing
     let mapInitialized = false;
     let isDragging = false;
+    let eventListenersSetup = false;
 
     // Map configuration
     const mapConfig = {
@@ -258,6 +259,18 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             
             diameterInput.addEventListener('keydown', function(e) {
                 e.stopPropagation();
+            });
+
+            // Handle diameter changes in edit mode
+            diameterInput.addEventListener('change', function(e) {
+                if (mapMode === 'edit' && selectedPlant && placedPlants[selectedPlant]) {
+                    const newDiameter = parseFloat(e.target.value);
+                    if (!isNaN(newDiameter) && newDiameter > 0) {
+                        placedPlants[selectedPlant].diameter = newDiameter;
+                        console.log('📏 Updated plant diameter:', selectedPlant, 'to', newDiameter);
+                        renderMapPlants();
+                    }
+                }
             });
             
             console.log('✅ Diameter input handlers setup');
@@ -589,7 +602,11 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             console.log('💾 Saved plant position after drag in add mode');
         }
         isDragging = false;
-        selectedPlant = null;
+        
+        // Only clear selectedPlant in add mode, keep it in edit mode for dropdown changes
+        if (mapMode !== 'edit') {
+            selectedPlant = null;
+        }
     }
 
     function findPlantAtPosition(x, y) {
@@ -776,13 +793,16 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         // Hide all buttons except check and X
         hideAllButtonsExceptConfirmCancel();
         
+        // Enable dropdown and diameter input for editing
+        enableDropdownAndDiameter();
+        
         // Change cursor to indicate edit mode
         const mapContainer = document.getElementById('mapContainer');
         if (mapContainer) {
             mapContainer.style.cursor = 'move';
         }
         
-        console.log('✏️ Edit mode activated - click and drag plants to reposition');
+        console.log('✏️ Edit mode activated - click and drag plants to reposition, or change plant type/diameter');
     }
 
     function cancelEditMode() {
@@ -857,9 +877,11 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
     }
 
     function hideAllButtonsExceptConfirmCancel() {
-        // Hide all primary buttons
-        hideElement('map-diameter-input');
-        hideElement('map-plant-select');
+        // Keep dropdown and diameter input visible
+        showElement('map-diameter-input');
+        showElement('map-plant-select');
+        
+        // Hide action buttons
         hideElement('map-add-btn');
         hideElement('map-edit-btn');
         hideElement('map-delete-btn');
@@ -868,8 +890,36 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         hideElement('map-upload-btn');
         hideElement('map-clear-btn');
         
-        // Show only confirm/cancel controls
+        // Show confirm/cancel controls
         showElement('map-edit-controls');
+    }
+
+    function enableDropdownAndDiameter() {
+        const dropdown = document.getElementById('map-plant-select');
+        const diameterInput = document.getElementById('map-diameter-input');
+        
+        if (dropdown) {
+            dropdown.disabled = false;
+            dropdown.style.opacity = '1';
+        }
+        if (diameterInput) {
+            diameterInput.disabled = false;
+            diameterInput.style.opacity = '1';
+        }
+    }
+
+    function disableDropdownAndDiameter() {
+        const dropdown = document.getElementById('map-plant-select');
+        const diameterInput = document.getElementById('map-diameter-input');
+        
+        if (dropdown) {
+            dropdown.disabled = true;
+            dropdown.style.opacity = '0.5';
+        }
+        if (diameterInput) {
+            diameterInput.disabled = true;
+            diameterInput.style.opacity = '0.5';
+        }
     }
 
     function showAllButtons() {
@@ -883,6 +933,9 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         showElement('map-download-btn');
         showElement('map-upload-btn');
         showElement('map-clear-btn');
+        
+        // Re-enable dropdown and diameter input
+        enableDropdownAndDiameter();
         
         // Hide confirm/cancel controls
         hideElement('map-edit-controls');
@@ -1161,6 +1214,9 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         // Hide all buttons except check and X
         hideAllButtonsExceptConfirmCancel();
         
+        // Disable dropdown and diameter input in delete mode
+        disableDropdownAndDiameter();
+        
         // Change cursor to indicate delete mode
         const mapContainer = document.getElementById('mapContainer');
         if (mapContainer) {
@@ -1374,6 +1430,32 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
             return;
         }
 
+        // Handle edit mode - change the selected plant's type
+        if (mapMode === 'edit' && selectedPlant && placedPlants[selectedPlant]) {
+            const oldPlant = placedPlants[selectedPlant];
+            const newPlantData = window.plantsDatabase?.find(p => p.name === selectedPlantName);
+            
+            if (newPlantData) {
+                // Update plant type while preserving position and custom diameter
+                placedPlants[selectedPlant] = {
+                    ...oldPlant,
+                    name: selectedPlantName,
+                    emoji: getPlantEmoji(newPlantData),
+                    diameter: oldPlant.diameter || getPlantDiameter(newPlantData)
+                };
+                
+                // Update diameter input to match new plant's default if no custom diameter
+                const diameterInput = document.getElementById('map-diameter-input');
+                if (!oldPlant.diameter && diameterInput) {
+                    diameterInput.value = getPlantDiameter(newPlantData);
+                }
+                
+                console.log('🌱 Updated plant type:', selectedPlant, 'to', selectedPlantName);
+                renderMapPlants();
+            }
+            return;
+        }
+
         // Update diameter input when plant selection changes
         updateDiameterInputFromPlant(selectedPlantName);
         
@@ -1396,8 +1478,12 @@ console.log('📍 Map data loaded:', window.mapPlants.length, 'plants');`;
         // Plant dropdown
         const plantSelect = document.getElementById('map-plant-select');
         if (plantSelect) {
+            // Remove existing listener if any to prevent duplicates
+            plantSelect.removeEventListener('change', handlePlantDropdownChange);
             plantSelect.addEventListener('change', handlePlantDropdownChange);
             console.log('✅ Plant dropdown listener added');
+        } else {
+            console.log('❌ Plant dropdown element not found');
         }
         
         // Add button

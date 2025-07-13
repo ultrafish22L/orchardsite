@@ -61,6 +61,8 @@ window.AppManager = (function() {
             // Initialize map if not already done
             if (window.MapManager) {
                 window.MapManager.initializeMap();
+                // Setup event listeners after mapNav is shown
+                window.MapManager.setupMapEventListeners();
             }
         } else {
             console.log('🌱 Activating other page:', page);
